@@ -1,27 +1,35 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
-Vue.use(VueRouter)
 
-const routes = [
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import Layout from '@/components/Layout/index.vue';
+
+/**
+ * RouteConfig Props
+ */
+export const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    component: Layout,
+    redirect: '/EngineeringMetric',
+    children: [
+      {
+        path: 'EngineeringMetric',
+        name: 'EngineeringMetric',
+        meta: {
+          title: '工程指标',
+          hidden: false,
+          icon: 'code',
+        },
+        component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/EngineerManagePanel/index.vue')
+      }
+    ]
   }
-]
+];
 
+Vue.use(VueRouter);
 const router = new VueRouter({
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
