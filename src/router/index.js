@@ -22,7 +22,30 @@ export const routes = [
           icon: 'code',
         },
         component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/EngineerManagePanel/index.vue')
-      }
+      },
+      {
+        path: 'PortraitManagement',
+        name: 'PortraitManagement',
+        redirect: '/PortaraitManagement/EmployeePortrait',
+        meta: {
+          title: '画像管理',
+          sort: 1,
+          icon: 'smile',
+        },
+        component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/Portrait/index.vue'),
+        children: [
+          {
+            path: 'EmployeePortrait',
+            name: 'EmployeePortrait',
+            meta: {
+              title: '画像信息',
+              home: true,
+              hidden: false,
+            },
+            component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/Portrait/EmployeePortrait/index.vue')
+          }
+        ]
+      },
     ]
   },
   {
@@ -40,16 +63,7 @@ export const routes = [
         },
         component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/Portrait/index.vue')
       },
-      {
-        path: 'EmployeePortrait',
-        name: 'EmployeePortrait',
-        meta: {
-          title: '画像信息',
-          home: true,
-          hidden: false,
-        },
-        component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/Portrait/EmployeePortrait/index.vue')
-      }
+
     ]
   },
 
