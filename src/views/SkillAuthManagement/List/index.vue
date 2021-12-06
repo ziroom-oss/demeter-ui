@@ -86,13 +86,12 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-import { getUserinfo } from '@ziroom/zcloud-head';
-@Component({
-  data() {
+//import { getUserinfo } from '@ziroom/zcloud-head';
+export default {
+   data: function() {
     return {
       receiveTaskFilter: {
         taskStatus: 0,
@@ -127,6 +126,7 @@ import { getUserinfo } from '@ziroom/zcloud-head';
       ]
     }
   },
+
   async mounted() {
     const allTaskFlowStatus = await taskServer.getAllSkillFlowStatus();
     this.allTaskFlowStatus = allTaskFlowStatus.map(status => {
@@ -240,13 +240,5 @@ import { getUserinfo } from '@ziroom/zcloud-head';
       })
     },
   }
-})
-
-@RouteConfig({
-  layout: true,
-  name: 'SkillAuthManagement_List',
-  title: '认领列表',
-})
-export default class App extends Vue {
 }
 </script>

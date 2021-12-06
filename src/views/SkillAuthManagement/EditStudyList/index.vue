@@ -94,11 +94,10 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import authServer from '@/apis/authorize.js';
 import ehrServer from '@/apis/ehr.js';
 import taskServer from '@/apis/task.js';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import mapServer from '@/apis/map.js'
 import { omit } from 'lodash-es';
 
@@ -109,7 +108,7 @@ import MapSkillStudyListTree from '@/components/RemoteMapSkillTree/studyList.vue
 
 import SkillPointComponent from '@/components/skill/SkillPointComponent.vue';
 
-@Component({
+export default {
   components: {
     MapSkillPointTree,
     SkillPointComponent,
@@ -137,8 +136,8 @@ import SkillPointComponent from '@/components/skill/SkillPointComponent.vue';
       deep: true
     }
   },
-  
-  data () {
+
+   data: function() {
     return {
       // mapSkillTree 如果弹出过一次就不必再次渲染
       showSkillMapTreeEdit: false,
@@ -161,12 +160,7 @@ import SkillPointComponent from '@/components/skill/SkillPointComponent.vue';
       skillPointModels: [],
       studyPaths: [],
     }
-  },
-  // computed: {
-  //   learnPeriod() {
-  //     return [this.learnPeriodStart, this.learnPeriodEnd];
-  //   }
-  // },
+  },  
   mounted () {
     const studyListId = this.$route.query.id;
     if (studyListId) {
@@ -350,14 +344,7 @@ import SkillPointComponent from '@/components/skill/SkillPointComponent.vue';
       }
     }
   }
-})
-@RouteConfig({
-  layout: true,
-  name: "SkillAuthManagement_EditStudyList",
-  title: "学习清单编辑",
-  hidden: true
-})
-export default class App extends Vue {}
+}
 </script>
 
 <style scoped>

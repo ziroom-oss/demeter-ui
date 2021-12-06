@@ -50,8 +50,8 @@
             </el-col>
             <el-col :span="5">
               <el-input
-                v-model="releaseTaskFilter.taskName"
-                placeholder="技能点名称"
+                v-model="releaseTaskFilter.nameOrNo"
+                placeholder="技能点名称/编号"
                 clearable
                 size="small"
               ></el-input>
@@ -62,15 +62,12 @@
             </el-col>
           </el-row>
         </div>
-
-         <SkillDialog
+        <SkillDialog
           :showSkillDialog="showSkillDialog"
           @closepop="closepop"
           :selectNodes="selectNodes"
           @refresh="refresh"
           :editId="editId"/>
-
-
         <div>
           <el-table :data="releaseTaskList" style="width: 100%">
             <el-table-column label="编号" prop="taskNo" align="center" width="70"></el-table-column>
@@ -84,21 +81,21 @@
               </template>
             </el-table-column>
             <el-table-column label="状态" prop="taskStatusName" align="center" width="70"></el-table-column>
-            <el-table-column label="创建时间" prop="createTime" align="center" width="100"></el-table-column>
-            <el-table-column label="技能值" prop="skillReward" align="center" width="60"></el-table-column>
-            <el-table-column label="发布人" prop="publisher" align="center" width="80"></el-table-column>
+            <el-table-column label="创建时间" prop="taskCreateTime" align="center" width="100"></el-table-column>
+            <el-table-column label="技能值" prop="growthValue" align="center" width="60"></el-table-column>
+            <el-table-column label="发布人" prop="publisherName" align="center" width="80"></el-table-column>
             <el-table-column label="操作" prop="" align="center" width="">
               <template slot-scope="scope">
                 <span>
-                  <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/Task/SkillTaskDetail', query: { id: scope.row.id }})">查看</el-button>
+                  <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/Task/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
                 </span>
-                <span v-if="scope.row.taskType === 1 && scope.row.taskStatus === 2">
+                <span v-if="scope.row.publisher === getCurrentUid() && scope.row.taskReceiverName === '' && scope.row.taskType === 1 && scope.row.taskStatus === 2">
                   <el-button type="text" size="small" @click="openEditSkill(scope.row.id)">编辑</el-button>
                 </span>
-                <span v-if="scope.row.taskType === 1 && scope.row.taskStatus === 2">
+                <span v-if="scope.row.publisher === getCurrentUid() && scope.row.taskType === 1 && scope.row.taskStatus === 2">
                   <el-button type="text" size="small" @click="confirmChange(scope.row.id, scope.row.taskType, 1)">启用</el-button>
                 </span>
-                <span v-if="scope.row.taskType === 1 && scope.row.taskStatus === 1">
+                <span v-if="scope.row.publisher === getCurrentUid() && scope.row.taskType === 1 && scope.row.taskStatus === 1">
                   <el-button type="text" size="small" @click="confirmChange(scope.row.id, scope.row.taskType, 2)">禁用</el-button>
                 </span>
               </template>
@@ -122,12 +119,13 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
-import newTaskServer from '@/apis/newTask.js';
-import { getUserinfo } from '@ziroom/zcloud-head';
+import taskServer from '@/apis/task.js';
+import ehrServer from '@/apis/ehr.js';
+import dayjs from 'dayjs';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import RemoteTreeSelect from '@/components/RemoteTreeSelect';
 import SkillDialog from '@/components/skill/New.vue'
-@Component({
+export default {
   components: {
     RemoteTreeSelect,
     SkillDialog
@@ -137,6 +135,7 @@ import SkillDialog from '@/components/skill/New.vue'
       deep: true,
       immediate: true,
       handler(newArray, oldArray) {
+        console.log(newArray);
         this.releaseTaskFilter.skillTreeIds = newArray.map(node => {
           return node.id;
         })
@@ -144,18 +143,19 @@ import SkillDialog from '@/components/skill/New.vue'
       }
     }
   },
-  data() {
+ data: function() {
     return {
       selectNodes: [],
       releaseTaskFilter: {
         skillPointLevel: '',
+        // @daijr
         skillTreeIds: [],
         taskType: 1,
         systemCode: '',
-        taskName: '',
+        nameOrNo: '',
         taskStatus: '',
         pageSize: 10,
-        offset: 1,
+        pageNumber: 1,
       },
       allTaskStatus: [],
       allTaskFlowStatus: [],
@@ -176,6 +176,7 @@ import SkillDialog from '@/components/skill/New.vue'
       editId: 0
     }
   },
+
   mounted() {
     this.getCurrentUid();
     this.refresh();
@@ -203,15 +204,26 @@ import SkillDialog from '@/components/skill/New.vue'
       this.searchReleaseList();
     },
     handleReleaseCurrentChange (val) {
-      this.releaseTaskFilter.offset = val;
+      this.releaseTaskFilter.pageNumber = val;
       this.searchReleaseList();
     },
     queryPeople (query) {
       this.loading = true;
+      ehrServer.getEmpList({ empCodeNameAdcode: query }).then(data => {
+        this.loading = false;
+        this.publisherList = data.map(user => {
+          return {
+            code: user.code,
+            email: user.email,
+            name: user.name + '(' + user.email.split('@')[0] + ')'
+          };
+        });
+      }).catch(() => {
+        this.loading = false;
+      });
     },
     getAllTypeChange () {
-      newTaskServer.getAllSkillStatus().then(data => {
-         console.log(data);
+      taskServer.getAllSkillStatus().then(data => {
         this.allTaskStatus = data.map(s => {
           return {
             label: s.desc,
@@ -219,10 +231,9 @@ import SkillDialog from '@/components/skill/New.vue'
           }
         })
       })
-     
     },
     getAllSkillLevel () {
-      newTaskServer.getAllSkillLevel().then(data => {
+      taskServer.getAllSkillLevel().then(data => {
         console.log(data);
         this.pointLevelList = data.map(s => {
           return {
@@ -234,28 +245,32 @@ import SkillDialog from '@/components/skill/New.vue'
     },
     searchReleaseList () {
       const params = this.releaseTaskFilter;
-      newTaskServer.getReleaseList(params).then(data => {
-        console.log(data);
-        this.total = data.pages;
+      taskServer.releaseList(params).then(data => {
+        this.total = data.total;
         const skillPointList = data.data;
         if (skillPointList) {
-          this.releaseTaskList = skillPointList;
+          this.releaseTaskList = skillPointList.map(skillPoint => {
+            return {
+              ...skillPoint,
+              taskCreateTime: dayjs(skillPoint.taskCreateTime).format('YYYY-MM-DD HH:mm:ss')
+            }
+          })
         } else {
           this.releaseTaskList = []
         }
       });
     },
     searchReceiveList () {
-      // const params = this.receiveTaskFilter;
-      // taskServer.receiveList(params).then(data => {
-      //   this.total = data.total;
-      //   this.receiveTaskList = data.data.map(task => {
-      //     return {
-      //       ...task,
-      //       taskCreateTime: dayjs(task.createTime).format('YYYY-MM-DD HH:mm:ss')
-      //     }
-      //   })
-      // })
+      const params = this.receiveTaskFilter;
+      taskServer.receiveList(params).then(data => {
+        this.total = data.total;
+        this.receiveTaskList = data.data.map(task => {
+          return {
+            ...task,
+            taskCreateTime: dayjs(task.createTime).format('YYYY-MM-DD HH:mm:ss')
+          }
+        })
+      })
     },
     confirmChange (id, taskType, status) {
       if (status === 2) {
@@ -274,31 +289,18 @@ import SkillDialog from '@/components/skill/New.vue'
       }
     },
     changeTaskStatus (id, taskType, status) {
-      console.log(id);
-      newTaskServer.changeTaskStatus(id, taskType, status).then(data => {
+      taskServer.changeTaskStatus(id, taskType, status).then(data => {
         this.searchReleaseList();
       }).catch(() => {
         this.searchReleaseList();
       })
     },
-    onTabChange (tab) {
-      if (tab.index === '0') {
-        this.searchReleaseList();
-      } else if (tab.index === '1') {
-        this.searchReceiveList();
-      }
-    },
     getCurrentUid () {
-      return 'xxx';
+      // const user = getUserinfo();
+      // return user.userInfo.uid
+      return '60028724';
     },
   }
-})
-@RouteConfig({
-  layout: true,
-  name: 'SkillPointList',
-  title: '技能点列表',
-})
-export default class App extends Vue {
 }
 </script>
 <style>

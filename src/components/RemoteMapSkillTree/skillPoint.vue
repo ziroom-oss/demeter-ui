@@ -51,7 +51,7 @@
  */
 import RemoteSkillMapSelect from '@/components/RemoteSkillMapSelect.vue';
 import RemoteJobLevelsSelect from '@/components/RemoteJobLevelsSelect.vue';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import mixin from './mixin';
 import { cloneDeep } from 'lodash-es';
 

@@ -1,31 +1,17 @@
 <template>
   <div>
     <el-tabs type="border-card" @tab-click="onTabChange">
-      <el-tab-pane label="发布任务列表">
+      <el-tab-pane label="发布任务列表" v-if="roles.includes('') || roles.includes('demeter-super-admin') || roles.includes('demeter-dept-admin')">
         <div>
           <el-row :gutter="10">
-            <!-- <el-col :span="4">
-              <el-select
-                v-model="releaseTaskFilter.taskType"
-                placeholder="任务类型"
-                size="small"
-                @change="releaseTypeChange">
-                <el-option
-                  v-for="item in allTaskTypes"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </el-col> -->
             <el-col :span="3">
               <el-select
                 v-model="releaseTaskFilter.taskStatus"
                 placeholder="选择任务状态"
                 size="small">
                 <el-option
-                  v-for="item in allTaskStatus"
-                  :key="item.value"
+                  v-for="(item,index) in allTaskStatus"
+                  :key="index+1"
                   :label="item.label"
                   :value="item.value">
                 </el-option>
@@ -34,7 +20,7 @@
             <el-col :span="6">
               <el-select
                 v-model="releaseTaskFilter.systemCode"
-                placeholder="输入姓名/工号/邮箱前缀搜索"
+                placeholder="输入姓名"
                 filterable
                 remote
                 clearable
@@ -42,7 +28,7 @@
                 :remote-method="queryPeople"
                 size="small"
               >
-              <el-option v-for="item in publisherList" :key="item.code" :label="item.name" :value="item.code"></el-option>
+              <el-option v-for="(item,index) in publisherList" :key="index" :label="item.name" :value="item.code"></el-option>
               </el-select>
             </el-col>
             <el-col :span="6">
@@ -120,28 +106,14 @@
         label="接收任务列表">
         <div>
           <el-row :gutter="10">
-            <!-- <el-col :span="4">
-              <el-select
-                v-model="receiveTaskFilter.taskType"
-                placeholder="选择任务类型"
-                size="small"
-                @change="receiveTypeChange">
-                <el-option
-                  v-for="item in allTaskTypes"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value">
-                </el-option>
-              </el-select>
-            </el-col> -->
             <el-col :span="4">
               <el-select
                 v-model="receiveTaskFilter.taskStatus"
                 placeholder="执行状态"
                 size="small">
                 <el-option
-                  v-for="item in allTaskFlowStatus"
-                  :key="item.value"
+                  v-for="(item,index) in allTaskFlowStatus"
+                  :key="index+2"
                   :label="item.label"
                   :value="item.value">
                 </el-option>
@@ -150,7 +122,7 @@
             <el-col :span="5">
               <el-select
                 v-model="receiveTaskFilter.systemCode"
-                placeholder="姓名/工号/邮箱前缀"
+                placeholder="输入姓名"
                 filterable
                 remote
                 clearable
@@ -158,7 +130,7 @@
                 :remote-method="queryPeople"
                 size="small"
               >
-                <el-option v-for="item in publisherList" :key="item.code" :label="item.name" :value="item.code"></el-option>
+                <el-option v-for="(item,index) in publisherList" :key="index+3" :label="item.name" :value="item.code"></el-option>
               </el-select>
             </el-col>
             <el-col :span="4">
@@ -236,14 +208,16 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import taskServer from '@/apis/task.js';
+import authServer from '@/apis/authorize.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-import { getUserinfo } from '@ziroom/zcloud-head';
-@Component({
-  data() {
+//import { getUserinfo } from '@ziroom/zcloud-head';
+
+export default {
+  data: function() {
     return {
+      roles: [],
       releaseTaskFilter: {
         taskType: 2,
         taskStatus: '',
@@ -271,6 +245,7 @@ import { getUserinfo } from '@ziroom/zcloud-head';
     }
   },
   mounted() {
+    this.getCurrentRole();
     this.getCurrentUid();
     taskServer.getAllTaskTypes().then(data => {
       this.allTaskTypes = data.map(type => {
@@ -285,6 +260,11 @@ import { getUserinfo } from '@ziroom/zcloud-head';
     this.getAllAssignFlowStatus();
   },
   methods: {
+     getCurrentRole () {
+      authServer.getAuthorize().then(data => {
+        this.roles = data.roles;
+      })
+    },
     refresh() {
       this.refreshRelease();
       this.refreshReceive();
@@ -326,48 +306,6 @@ import { getUserinfo } from '@ziroom/zcloud-head';
         this.loading = false;
       });
     },
-    // releaseTypeChange (value) {
-    //   if (value === 1) {
-    //     taskServer.getAllSkillStatus().then(data => {
-    //       this.allTaskStatus = data.map(s => {
-    //         return {
-    //           label: s.desc,
-    //           value: s.code
-    //         }
-    //       })
-    //     })
-    //   } else if (value === 2) {
-    //     taskServer.getAllAssignStatus().then(data => {
-    //       this.allTaskStatus = data.map(s => {
-    //         return {
-    //           label: s.desc,
-    //           value: s.code
-    //         }
-    //       })
-    //     })
-    //   }
-    // },
-    // receiveTypeChange (value) {
-    //   if (value === 1) {
-    //     taskServer.getAllSkillFlowStatus().then(data => {
-    //       this.allTaskFlowStatus = data.map(s => {
-    //         return {
-    //           label: s.desc,
-    //           value: s.code
-    //         }
-    //       })
-    //     })
-    //   } else if (value === 2) {
-    //     taskServer.getAllAssignFlowStatus().then(data => {
-    //       this.allTaskFlowStatus = data.map(s => {
-    //         return {
-    //           label: s.desc,
-    //           value: s.code
-    //         }
-    //       })
-    //     })
-    //   }
-    // },
     getAllAssignStatus () {
       taskServer.getAllAssignStatus().then(data => {
         this.allTaskStatus = data.map(s => {
@@ -439,9 +377,13 @@ import { getUserinfo } from '@ziroom/zcloud-head';
       })
     },
     onTabChange (tab) {
-      if (tab.index === '0') {
-        this.searchReleaseList();
-      } else if (tab.index === '1') {
+      if(this.roles.includes('') || this.roles.includes('demeter-super-admin') || roles.includes('demeter-dept-admin')){
+        if (tab.index === '0') {
+          this.searchReleaseList();
+        } else if (tab.index === '1') {
+          this.searchReceiveList();
+        }
+      } else{
         this.searchReceiveList();
       }
     },
@@ -542,12 +484,5 @@ import { getUserinfo } from '@ziroom/zcloud-head';
       })
     },
   }
-})
-@RouteConfig({
-  layout: true,
-  name: 'TaskList',
-  title: '任务列表',
-})
-export default class App extends Vue {
 }
 </script>

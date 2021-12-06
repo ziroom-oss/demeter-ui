@@ -38,7 +38,7 @@ import G6 from '@antv/g6';
 import { buildTreeByNodes, graphInit, registerNode, dataTransform } from './index.js';
 import { cloneDeep } from 'lodash-es';
 import skillPointServer from '@/apis/skill.js';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 const echarts = require('echarts/lib/echarts');
 
 export default {

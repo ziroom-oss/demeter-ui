@@ -326,13 +326,12 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
+
 import portraitServer from '@/apis/portrait.js';
 import authServer from '@/apis/authorize.js';
 import ehrServer from '@/apis/ehr.js';
 import NewEhrServer from '@/apis/newEhr.js';
 import PortraitPerson from '@/apis/portraitPerson.js';
-import { getUserinfo } from '@ziroom/zcloud-head';
 import { isEmpty } from 'lodash-es';
 import mapServer from '@/apis/map.js'
 import RemoteMapSkillTreePreview from '@/components/RemoteMapSkillTree/preview.vue';
@@ -362,11 +361,13 @@ var skillAuthCountOption;
 var skillGraphCountOption;
 var engineeringMetricOption;
 var projectCharts1Option;
-@Component({
-  components: {
+
+export default {
+ components: {
     RemoteMapSkillTreePreview,
   },
-  watch: {
+
+   watch: {
     selectUserCode: {
       handler(val) {
         if (this.selectTab === 'portrayal') {
@@ -402,11 +403,7 @@ var projectCharts1Option;
     }
   },
 
-  mounted () {
-    this.activePortrayalInfo();
-  },
-
-  data () {
+  data: function() {
     return {
       PortraitDevlopTeam:[],
       PortraitPersonGrowingupRespVOs:[],
@@ -476,9 +473,13 @@ var projectCharts1Option;
           }
         }]
       },
-      
     }
   },
+
+  mounted () {
+    this.activePortrayalInfo();
+  },
+
   methods: {
     convertSecond2Hour (s) {
       return this.MathCeil(s / (60 * 60));
@@ -664,7 +665,7 @@ var projectCharts1Option;
       }
     },
     getCurrentUid () {
-      const user = getUserinfo();
+      const user = '60033587';
       return user.userInfo.uid
     },
     handleClick (tab, event) {
@@ -1108,15 +1109,8 @@ var projectCharts1Option;
       })
     },
   }
-})
-@RouteConfig({
-  layout: true,
-  // home: true,
-  name: 'EmployeePortrait',
-  title: '画像信息',
-})
-export default class App extends Vue {
 }
+
 </script>
 <style>
 .growthinfo-layout {

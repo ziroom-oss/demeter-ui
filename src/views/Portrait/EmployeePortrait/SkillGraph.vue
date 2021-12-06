@@ -5,15 +5,19 @@
 </template>
 
 <script>
-import { Component, Vue } from '@ziroom/cherry2-decorator';
 import RemoteSkillMapSelect from '@/components/RemoteSkillMapSelect';
 
-@Component({
+export default {
   components: {
     RemoteSkillMapSelect,
-  }
-})
-export default class App extends Vue {
-  searchGraphName = '';
+  },
+  data: function() {
+    return {
+      searchGraphName : '',
+    }
+  },
+  methods: {
+    }
+  
 }
 </script>

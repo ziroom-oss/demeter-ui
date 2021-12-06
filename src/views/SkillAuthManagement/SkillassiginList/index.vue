@@ -123,13 +123,12 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from "@ziroom/cherry2-decorator";
 import taskServer from "@/apis/task.js";
 import ehrServer from "@/apis/ehr.js";
 import dayjs from "dayjs";
-import { getUserinfo } from "@ziroom/zcloud-head";
-@Component({
-  data() {
+//import { getUserinfo } from "@ziroom/zcloud-head";
+export default {
+ data: function() {
     return {
       //搜索参数
       studyListFilter: {
@@ -293,11 +292,5 @@ import { getUserinfo } from "@ziroom/zcloud-head";
         });
     },
   },
-})
-@RouteConfig({
-  layout: true,
-  name: "SkillAuthManagement_SkillAssignList",
-  title: "技能分配列表",
-})
-export default class App extends Vue {}
+}
 </script>

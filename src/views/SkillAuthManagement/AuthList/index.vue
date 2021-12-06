@@ -85,14 +85,26 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
+//import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import skillPointServer from '@/apis/skill.js'
-@Component({
-  data() {
+export default {
+
+  async mounted() {
+      const allTaskFlowStatus = await taskServer.getAllSkillFlowStatus();
+      this.allTaskFlowStatus = allTaskFlowStatus.map(type => {
+        return {
+          label: type.desc,
+          value: type.code,
+        }
+      })
+      this.refresh();
+  },
+
+  data: function() {
     return {
       receiveTaskFilter: {
         // skillPointLevel: 0,
@@ -127,16 +139,7 @@ import skillPointServer from '@/apis/skill.js'
       ]
     }
   },
-  async mounted() {
-    const allTaskFlowStatus = await taskServer.getAllSkillFlowStatus();
-    this.allTaskFlowStatus = allTaskFlowStatus.map(type => {
-      return {
-        label: type.desc,
-        value: type.code,
-      }
-    })
-    this.refresh();
-  },
+
   methods: {
     quickCheck (id, taskUserId, receiverUid, taskId) {
       const p = {
@@ -265,13 +268,5 @@ import skillPointServer from '@/apis/skill.js'
       })
     },
   }
-})
-
-@RouteConfig({
-  layout: true,
-  name: 'SkillAuthManagement_AuthList',
-  title: '认证列表',
-})
-export default class App extends Vue {
 }
 </script>

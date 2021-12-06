@@ -335,17 +335,17 @@
   </div>
 </template>
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import taskServer from '@/apis/task.js';
 import dayjs from 'dayjs';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import ehrServer from '@/apis/ehr.js';
 import SvgIcon from '@/components/svg-icon.vue';
-@Component({
-  components: {
+
+export default {
+    components: {
     SvgIcon
   },
-  data() {
+  data: function() {
     return {
       task: {},
       receiverList: [],
@@ -693,14 +693,6 @@ import SvgIcon from '@/components/svg-icon.vue';
       });
     },
   }
-})
-@RouteConfig({
-  layout: true,
-  name: 'AssignDetail',
-  title: '指派任务详情',
-  hidden: true,
-})
-export default class App extends Vue {
 }
 </script>
 <style>

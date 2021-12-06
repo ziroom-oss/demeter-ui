@@ -1,6 +1,5 @@
 
 import G6 from '@antv/g6';
-import { Vue } from '@ziroom/cherry2-decorator';
 import mainVueTemplate from '../GraphTree/index.vue';
 import { cloneDeep } from 'lodash-es';
 

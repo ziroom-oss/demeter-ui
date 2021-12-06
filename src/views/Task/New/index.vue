@@ -6,16 +6,6 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
-
-@Component({
-})
-@RouteConfig({
-  layout: true,
-  name: 'NewTask',
-  title: '新建任务',
-  hidden: true
-})
-export default class App extends Vue {
+export default {
 }
 </script>

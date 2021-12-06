@@ -16,12 +16,23 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import tree from '@/apis/tree.js';
 import { Input, Button } from 'element-ui';
 import { pick } from 'lodash-es';
 
-@Component({
+export default {
+   data: function() {
+    return {
+        tree : [],
+        treeMemo : {},
+        expandKeys : [],
+    }
+   },
+ 
+  mounted() {
+    this.getNodes();
+  },
+
   methods: {
     renderContent(h, { node, data, store }) {
       return h('div',{ class: { 'custom-tree-node': true } }, [h('span',{ class: { 'tree-node-name': true } },
@@ -40,26 +51,8 @@ import { pick } from 'lodash-es';
                                                             this.renderOperation(h, node, data),
                                                               ]
               )
-                                              }
-          }
-})
-
-@RouteConfig({
-  layout: true,
-  name: 'SkillTreeManagement',
-  title: '技能树管理',
-  sort: 2,
-})
-
-export default class App extends Vue {
-  tree = [];
-  treeMemo = {};
-  expandKeys = []
-  mounted() {
-    this.getNodes();
-  }
-
-  /**
+      },
+      /**
    * 构建层次结构的树
    */
   buildTreeByNodes(nodes) {
@@ -78,7 +71,7 @@ export default class App extends Vue {
     });
     //仅使用 rootNode 即可
     this.tree.push(memo[100000]);
-  }
+  },
 
   /**
    * 首先必须加载根节点，根节点有并且仅有一个
@@ -88,7 +81,7 @@ export default class App extends Vue {
       this.expandKeys = [100000]
       this.buildTreeByNodes(res);
     })
-  }
+  },
 
   /**
    * 平级添加子节点
@@ -115,7 +108,7 @@ export default class App extends Vue {
     const child = { id, name: '', saved: false, parentId: data.id };
     data.children.push(child);
     this.$set(child, 'children', []);
-  }
+  },
 
   /**
    * 移除节点
@@ -146,7 +139,7 @@ export default class App extends Vue {
       const index = parent.children.findIndex(child => child.id === id);
       parent.children.splice(index, 1);
     }
-  }
+  },
 
   findTreeNodeParent(id) {
     let result = null;
@@ -164,7 +157,7 @@ export default class App extends Vue {
     }
     recurive(this.tree[0]);
     return result;
-  }
+  },
 
   /**
    * 创建新节点
@@ -179,17 +172,17 @@ export default class App extends Vue {
       data.id = res;
       this.$message.success('保存节点成功');
     })
-  }
+  },
 
   /**
    * 更新节点
    */
   update(id, node) {
-    tree.update(pick(node, ['name', 'parentId', 'id'])).then(res => {
+    tree.update(id, pick(node, ['name', 'parentId', 'id'])).then(res => {
       node.saved = true;
       this.$message.success(`节点 ${node.name} 更新成功`);
     })
-  }
+  },
 
   /**
    * 不同状态、层级的节点渲染不同的操作按钮
@@ -230,6 +223,8 @@ export default class App extends Vue {
     );
     return element;
   }
+  }
+  
 }
 </script>
 

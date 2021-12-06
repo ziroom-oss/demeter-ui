@@ -88,21 +88,16 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import { pick } from 'lodash-es';
 import RemoteJobsSelect from '@/components/RemoteJobsSelect';
 import RemoteTreeSelect from '@/components/RemoteTreeSelect';
 import RemoteSkillMapSkillTree from '@/components//RemoteMapSkillTree/index.vue';
 import { dateFormatFromTableTime } from '@/common/utils/timeFormat';
 import map from '@/apis/map.js';
-import mapSkill from '@/apis/mapSkill.js';
-import newMapSkillServer from '@/apis/newMapSkill.js';
 import skillPointServer from '@/apis/skill.js';
-import newSkillPointServer from '@/apis/newSkill.js';
-import newEhrServer from '@/apis/newEhr.js';
 
-@Component({
-  components: {
+export default {
+   components: {
     RemoteJobsSelect,
     RemoteTreeSelect,
     RemoteSkillMapSkillTree,
@@ -124,7 +119,7 @@ import newEhrServer from '@/apis/newEhr.js';
           this.skillPoints = [];
           return;
         }
-        const skillPointsSource = await newSkillPointServer.querySkillPoint(params);
+        const skillPointsSource = await skillPointServer.querySkillPoint(params);
         const skillPoints = Object.values(skillPointsSource).reduce((accu, curr) => {
           accu = accu.concat(curr);
           return accu;
@@ -140,8 +135,8 @@ import newEhrServer from '@/apis/newEhr.js';
           return this.skillPoints = skillPoints;
         }
 
-        const skillTaskIds = await skillPoints.map(item => item.id);
-        const mapSkills = await mapSkill.listMapSkillsByMapId(this.skillMapId, { skillTaskIds });
+        const skillTaskIds = skillPoints.map(item => item.id);
+        const mapSkills = await map.listMapSkillsByMapId(this.skillMapId, { skillTaskIds });
         skillPoints.forEach(sp => {
           mapSkills.forEach(r => {
             if (r.skillTaskId === sp.id) {
@@ -151,7 +146,6 @@ import newEhrServer from '@/apis/newEhr.js';
             }
           })
         })
-         
         this.skillPoints = skillPoints;
       }
     }
@@ -168,45 +162,42 @@ import newEhrServer from '@/apis/newEhr.js';
       };
       return map[value];
     }
-  }
-})
-@RouteConfig({
-  layout: true,
-  name: 'SkillMapNew',
-  title: '新建技能图谱',
-  hidden: true,
-})
-export default class App extends Vue {
-  skillMapId = ''; // 技能图谱 id，路由传入，如果有则回显数据
-  // 技能图谱数据
-  skillMapCreateReq = {
-    name: '',
-    isEnable: 0,
-    jobId: '',
-  };
-  // 选中的技能树节点列表
-  selectNodes = [];
-  // 技能点列表
-  skillPoints = [];
-  // 职级选项
-  jobLevelOptions = [];
-  // 根据当前技能点列表和当前技能图谱查询的关联数据列表
-  mapSkills = [];
-  // 当前选中的技能点
-  multipleSelection = [];
-  // 图谱树预览窗口
-  showMapSkillsTree = false;
+  },
 
+   data: function() {
+    return {
+        skillMapId : '', // 技能图谱 id，路由传入，如果有则回显数据
+        // 技能图谱数据
+        skillMapCreateReq : {
+          name: '',
+          isEnable: 0,
+          jobId: '',
+        },
+        // 选中的技能树节点列表
+        selectNodes : [],
+        // 技能点列表
+        skillPoints : [],
+        // 职级选项
+        jobLevelOptions : [],
+        // 根据当前技能点列表和当前技能图谱查询的关联数据列表
+        mapSkills : [],
+        // 当前选中的技能点
+        multipleSelection : [],
+        // 图谱树预览窗口
+        showMapSkillsTree : false,
+      }
+   },
+  
   async created() {
     this.skillMapId = this.$route.query.id;
-    this.jobLevelOptions = await mapSkill.getTechRanks();
-  }
+    this.jobLevelOptions = await map.getTechRanks();
+  },
   async mounted() {
     if (this.skillMapId) {
       map.get(this.skillMapId).then(res => {
         this.skillMapCreateReq = res;
       });
-      const mapSkills = await mapSkill.getMapSkillTreeByMapId(this.skillMapId);
+      const mapSkills = await map.getMapSkillTreeByMapId(this.skillMapId);
       mapSkills.forEach(ms => {
         // mapSkills 后面会混入来自技能点（技能任务）的数据，
         // 避免双方的 id 混乱，在这里将其 id 赋值到 mapSkillId
@@ -216,100 +207,89 @@ export default class App extends Vue {
       this.mapSkills = mapSkills;
       this.$refs.mapSkillsTree.render({ canRemove: true, mapId: this.skillMapId, mapSkills, isFinished: false });
     }
+  },
+
+  methods: {
+    onSave() {
+      const submit = pick(this.skillMapCreateReq, ['name', 'jobId', 'isEnable']);
+      if (this.skillMapId) {
+        map.update(this.skillMapId, submit).then(res => {
+          this.saveMapSkills();
+        })
+      } else {
+        map.save(submit).then(res => {
+          this.skillMapId = res;
+          this.saveMapSkills();
+        })
+      }
+    },
+    // 保存新添加到技能树的节点，判断条件是该节点有无 skillMapId
+    saveMapSkills() {
+      const saveMapSkillQueue = [];
+      this.mapSkills.forEach(ms => {
+        if (!ms.skillMapId) {
+          saveMapSkillQueue.push(map.saveMapSkill({
+            skillMapId: this.skillMapId,
+            skillTaskId: ms.id,
+            jobLevel: ms.skillLevel || 1,
+          }))
+        }
+      })
+      Promise.all(saveMapSkillQueue).then(res => {
+        this.$message.success('保存成功');
+        this.$router.push('/system/skillMap');
+      }).catch(error => {
+        this.$message.error(error.message + '： 保存失败，请重新关联');
+        this.$router.push('/system/skillMap');
+      })
+    },
+    addSkill(row) {
+      console.log(row);
+      if (!this.skillMapCreateReq.name) {
+        return this.$message.warning('请先添加技能图谱名称');
+      }
+      const isRepeat = this.mapSkills.some(ms => ms.skillTaskId === row.id);
+      if (!isRepeat) {
+        // 远程获取的技能点列表没有 skillTaskId 字段，在压入 mapSkills 需要定义，方便上述的 isRepeat 检查
+        row.skillTaskId = row.id;
+        this.mapSkills.push(row);
+        this.$message.success(`已选择技能点 ${row.skillName}`);
+      } else {
+        return this.$message.warning(`技能点 ${row.skillName} 已存在`);
+      }
+      this.$refs.mapSkillsTree.render({
+        canRemove: true,
+        mapName: this.skillMapCreateReq.name,
+        mapId: this.skillMapId,
+        mapSkills: this.mapSkills,
+        isFinished: false
+      });
+    },
+    removeSkill(row) {
+      this.$confirm(`确认移除节点：${row.name} ？`)
+        .then(async () => {
+          if (row.mapSkillId) {
+            await map.deleteMapSkill(row.mapSkillId);
+          }
+          const index = this.mapSkills.findIndex(ms => ms.id === Number(row.id));
+          this.mapSkills.splice(index, 1);
+          this.$refs.mapSkillsTree.render({
+            canRemove: true,
+            mapName: this.skillMapCreateReq.name,
+            mapId: this.skillMapId,
+            mapSkills: this.mapSkills,
+            isFinished: false
+          });
+        })
+    },
+    onChangeJobLevel(row) {
+      if (row.mapSkillId) {
+        map.updateMapSkill(row.mapSkillId, { jobLevel: row.jobLevel }).then(res => {
+          this.$message.success(`更新技能点${row.taskName}的职级成功`);
+        })
+      }
+    }
   }
   
-  onSave() {
-    const submit = pick(this.skillMapCreateReq, ['name', 'jobId', 'isEnable']);
-    if (this.skillMapId) {
-      let params={
-        name:this.skillMapCreateReq.name,
-        jobId:this.skillMapCreateReq.jobId,
-        isEnable:this.skillMapCreateReq.isEnable,
-        id:this.skillMapId,
-      }
-      map.update(params).then(res => {
-        this.saveMapSkills();
-      })
-    } else {
-      map.save(submit).then(res => {
-        this.skillMapId = res;
-        this.saveMapSkills();
-      })
-    }
-  }
-
-  // 保存新添加到技能树的节点，判断条件是该节点有无 skillMapId
-  saveMapSkills() {
-    const saveMapSkillQueue = [];
-    this.mapSkills.forEach(ms => {
-      if (!ms.skillMapId) {
-        saveMapSkillQueue.push(map.saveMapSkill({
-          skillMapId: this.skillMapId,
-          skillTaskId: ms.id,
-          jobLevel: ms.skillLevel || 1,
-        }))
-      }
-    })
-
-    Promise.all(saveMapSkillQueue).then(res => {
-      this.$message.success('保存成功');
-      this.$router.push('/system/skillMap');
-    }).catch(error => {
-      this.$message.error(error.message + '： 保存失败，请重新关联');
-      this.$router.push('/system/skillMap');
-    })
-  }
-
-  addSkill(row) {
-    console.log(row);
-
-    if (!this.skillMapCreateReq.name) {
-      return this.$message.warning('请先添加技能图谱名称');
-    }
-
-    console.log(this.mapSkills);
-
-    const isRepeat = this.mapSkills.some(ms => ms.skillTaskId === row.id);
-    if (!isRepeat) {
-      // 远程获取的技能点列表没有 skillTaskId 字段，在压入 mapSkills 需要定义，方便上述的 isRepeat 检查
-      row.skillTaskId = row.id;
-      this.mapSkills.push(row);
-      this.$message.success(`已选择技能点 ${row.skillName}`);
-    } else {
-      return this.$message.warning(`技能点 ${row.skillName} 已存在`);
-    }
-    this.$refs.mapSkillsTree.render({
-      canRemove: true,
-      mapName: this.skillMapCreateReq.name,
-      mapId: this.skillMapId,
-      mapSkills: this.mapSkills,
-      isFinished: false
-    });
-  }
-
-  removeSkill(row) {
-    this.$confirm(`确认移除节点：${row.name} ？`)
-      .then(async () => {
-        if (row.mapSkillId) {
-          await mapSkill.deleteMapSkill(row.mapSkillId);
-        }
-        const index = this.mapSkills.findIndex(ms => ms.id === Number(row.id));
-        this.mapSkills.splice(index, 1);
-        this.$refs.mapSkillsTree.render({
-          canRemove: true,
-          mapName: this.skillMapCreateReq.name,
-          mapId: this.skillMapId,
-          mapSkills: this.mapSkills,
-          isFinished: false
-        });
-      })
-  }
-  onChangeJobLevel(row) {
-    if (row.mapSkillId) {
-      mapSkill.updateMapSkill(row.mapSkillId, { jobLevel: row.jobLevel }).then(res => {
-        this.$message.success(`更新技能点${row.taskName}的职级成功`);
-      })
-    }
-  }
 }
 </script>

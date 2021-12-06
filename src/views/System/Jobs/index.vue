@@ -26,9 +26,9 @@
   </div>
 </template>
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import jobs from '@/apis/jobs';
-@Component({
+
+export default {
   components: {
   },
   watch: {
@@ -40,15 +40,8 @@ import jobs from '@/apis/jobs';
         })
       }
     }
-  }
-})
-@RouteConfig({
-  layout: true,
-  name: 'JobsManagement',
-  title: '职务管理',
-})
-export default class App extends Vue {
-  data () {
+  },
+   data: function() {
     return {
       count: 0,
       dataSource: [
@@ -73,45 +66,47 @@ export default class App extends Vue {
         },
       ],
     }
-  }
+  },
   mounted() {
     jobs.listAll().then(res => {
       this.dataSource = res;
     });
-  }
-  updateRecord(record) {
-    if (record.id) {
-      jobs.update(record).then(() => {
-        this.$message.success('更新成功')
-      })
-    } else {
-      jobs.create(record).then((res) => {
-        record.id = res;
-        this.$message.success('添加成功');
-      })
-    }
-  }
-  deleteRecord(record) {
-    const del = (i) => {
-      const dataSource = [...this.dataSource];
-      this.dataSource = dataSource.filter(item => item.i !== i);
-    }
-    if (!record.id) {
-      return del(record.i);
-    }
-    jobs.delete(record.id).then(() => {
-      del(record.i);
-    });
-  }
-  addRecord() {
-    const { dataSource } = this;
-    const newData = {
-      name: '请填写职务名称',
-      code: 0,
-    };
-    this.dataSource = [...dataSource, newData];
-  }
+  },
 
+  methods: {
+    updateRecord(record) {
+      if (record.id) {
+        jobs.update(record).then(() => {
+          this.$message.success('更新成功')
+        })
+      } else {
+        jobs.create(record).then((res) => {
+          record.id = res;
+          this.$message.success('添加成功');
+        })
+      }
+    },
+    deleteRecord(record) {
+      const del = (i) => {
+        const dataSource = [...this.dataSource];
+        this.dataSource = dataSource.filter(item => item.i !== i);
+      }
+      if (!record.id) {
+        return del(record.i);
+      }
+      jobs.delete(record.id).then(() => {
+        del(record.i);
+      });
+    },
+    addRecord() {
+      const { dataSource } = this;
+      const newData = {
+        name: '请填写职务名称',
+        code: 0,
+      };
+      this.dataSource = [...dataSource, newData];
+    }
+  }
 }
 </script>
 <style>

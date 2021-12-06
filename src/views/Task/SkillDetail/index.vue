@@ -59,6 +59,13 @@
         </el-row>
         <el-row>
           <el-col :span="24">
+            <el-form-item label="附件：">
+              <el-link :href="task.attachmentUrl" target="_blank">{{ task.attachmentName }}</el-link>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
             <el-form-item label="备注：">
               {{ task.taskRemark }}
             </el-form-item>
@@ -215,9 +222,9 @@
                   <svg-icon iconname="icon-wenjian"></svg-icon>
                   <span style="font-size: 14px; font-weight: bold">技能点学习成果：</span>
                 </template>
-                <el-tooltip v-if="taskProgress.taskFinishOutcomeList" effect="light" content="点击下载学习成果" placement="top">
-                  <a :href="taskProgress.taskFinishOutcomeList[0].fileAddress">
-                    <span class="ellipsis">{{ taskProgress.taskFinishOutcomeList[0].fileName }}</span>
+                <el-tooltip v-if="taskProgress.taskFinishOutcomeList" effect="light" content="点击查看学习成果" placement="top">
+                  <a :href="taskProgress.taskFinishOutcomeList[0].fileAddress" >
+                    <span class="ellipsis">{{ taskProgress.taskFinishOutcomeList[0].fileName}}</span>
                   </a>
                 </el-tooltip>
                 <span v-else>-</span>
@@ -310,9 +317,9 @@
                 <span class="ellipsis">{{ getFileName() }}</span>
               </a>
             </el-tooltip> -->
-            <el-tooltip v-if="taskProgress.taskFinishOutcomeList" effect="light" content="点击下载学习成果" placement="top">
+            <el-tooltip v-if="taskProgress.taskFinishOutcomeList" effect="light" content="点击查看学习成果" placement="top">
               <a :href="taskProgress.taskFinishOutcomeList[0].fileAddress">
-                <span class="ellipsis">{{ taskProgress.taskFinishOutcomeList[0].fileName }}</span>
+                <span class="ellipsis">{{ taskProgress.taskFinishOutcomeList[0].fileName }} </span>
               </a>
             </el-tooltip>
             <span v-else>-</span>
@@ -350,16 +357,15 @@
   </div>
 </template>
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import taskServer from '@/apis/task.js';
 import map from '@/apis/map.js';
 import jobs from '@/apis/jobs.js';
 import tree from '@/apis/tree.js';
 import dayjs from 'dayjs';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import SvgIcon from '@/components/svg-icon.vue';
-@Component({
-  components: {
+export default {
+    components: {
     SvgIcon
   },
   data() {
@@ -477,10 +483,12 @@ import SvgIcon from '@/components/svg-icon.vue';
       // 不在指派人列表
       const isReceiver = this.receiverList.filter(user => user.receiverUid === this.getCurrentUid());
       if (isReceiver.length === 0) {
+        console.log(isReceiver.length);
         return 0;
       }
 
       if (!this.taskFinishConditionInfoRespList || this.taskFinishConditionInfoRespList.length === 0) {
+        console.log(!this.taskFinishConditionInfoRespList || this.taskFinishConditionInfoRespList.length === 0);
         // 在指派人列表中但未认领
         return 1;
       }
@@ -567,6 +575,7 @@ import SvgIcon from '@/components/svg-icon.vue';
       const user = getUserinfo();
       return user.userInfo.uid
     },
+
     // 检查是否可以认领，若接收者中已有当前登录人，则不可认领
     checkAccept () {
       const currentUid = this.getCurrentUid();
@@ -577,6 +586,7 @@ import SvgIcon from '@/components/svg-icon.vue';
         return true;
       }
     },
+
     acceptTask () {
       const id = this.task.id;
       const type = this.task.taskType;
@@ -658,14 +668,6 @@ import SvgIcon from '@/components/svg-icon.vue';
       })
     }
   }
-})
-@RouteConfig({
-  layout: true,
-  name: 'SkillDetail',
-  title: '技能点详情',
-  hidden: true,
-})
-export default class App extends Vue {
 }
 </script>
 <style lang="scss" scoped>

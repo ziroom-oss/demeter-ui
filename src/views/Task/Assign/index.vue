@@ -26,7 +26,7 @@
         <el-form-item label="任务指派人：" prop="taskReceiver" size="small">
           <el-select
             v-model="assignTaskForm.taskReceiver"
-            placeholder="通过姓名/工号/邮箱前缀搜索"
+            placeholder="通过姓名搜索"
             filterable
             remote
             clearable
@@ -67,24 +67,6 @@
             </el-option>
           </el-select>
         </el-form-item>
-        <!-- <el-form-item label="是否有惩罚：" prop="needPunishment" size="small" required>
-          <el-switch
-            v-model="assignTaskForm.needPunishment"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            :active-value="1"
-            :inactive-value="0">
-          </el-switch>
-        </el-form-item> -->
-        <!-- <el-form-item label="是否邮件提醒：" prop="needEmailRemind" size="small" required>
-          <el-switch
-            v-model="assignTaskForm.needEmailRemind"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            :active-value="1"
-            :inactive-value="0">
-          </el-switch>
-        </el-form-item> -->
         <el-form-item label="是否需要验收：" prop="needAcceptance" size="small" required>
           <el-switch
             v-model="assignTaskForm.needAcceptance"
@@ -132,14 +114,13 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import { v1 as uuidv1 } from 'uuid';
 import { cloneDeep } from 'lodash-es';
 
-@Component({
-  mounted() {
+export default {
+   mounted() {
     const id = this.$route.query.id;
     if (id) {
       this.getTask(id);
@@ -147,7 +128,7 @@ import { cloneDeep } from 'lodash-es';
     }
   },
 
-  data() {
+  data: function() {
     return {
       edit: false,
       assignTaskForm: {
@@ -189,7 +170,7 @@ import { cloneDeep } from 'lodash-es';
       loading: false,
     }
   },
-  methods: {
+   methods: {
     onModify (formName) {
       const data = new FormData();
       data.append('id', this.assignTaskForm.id);
@@ -213,14 +194,6 @@ import { cloneDeep } from 'lodash-es';
       });
     },
     onSubmit(formName) {
-      // this.$refs[formName].validate((valid) => {
-      //   if (valid) {
-      //     alert('submit!');
-      //   } else {
-      //     console.log('error submit!!');
-      //     return false;
-      //   }
-      // });
       const data = new FormData();
       data.append('taskName', this.assignTaskForm.taskName);
       data.append('taskStartTime', new Date(this.assignTaskForm.taskPeriod[0]));
@@ -275,8 +248,6 @@ import { cloneDeep } from 'lodash-es';
         key: uuidv1(),
         value: '',
       });
-      // this.$set(this.assignTaskForm, 'taskFinishCondition', this.assignTaskForm.taskFinishCondition.slice());
-      // this.$forceUpdate();
     },
     queryPeople (query) {
       this.loading = true;
@@ -320,12 +291,5 @@ import { cloneDeep } from 'lodash-es';
       })
     }
   }
-})
-@RouteConfig({
-  layout: true,
-  name: 'NewTaskAssign',
-  title: '新建指派任务',
-})
-export default class App extends Vue {
 }
 </script>

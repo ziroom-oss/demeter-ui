@@ -33,7 +33,7 @@
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import { pick } from 'lodash-es';
 import RemoteTreeSelect from '@/components/RemoteTreeSelect';
 import map from '@/apis/map.js';

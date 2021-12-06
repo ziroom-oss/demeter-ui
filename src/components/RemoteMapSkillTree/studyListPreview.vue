@@ -8,7 +8,7 @@
 /**
  * study 提供添加和移除技能点、学习路径的功能
  */
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import { cloneDeep } from 'lodash-es';
 import GraphTree from './GraphTree/index';
 import treeServer from '@/apis/tree';

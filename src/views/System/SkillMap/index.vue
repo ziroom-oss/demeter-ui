@@ -89,13 +89,12 @@
 </template>
 
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import map from '@/apis/map';
 import { dateFormatFromTableTime } from '@/common/utils/timeFormat';
 import RemoteJobsSelect from '@/components/RemoteJobsSelect';
 import RemoteSkillMapSkillTree from '@/components//RemoteMapSkillTree/index.vue';
 
-@Component({
+export default {
   components: {
     RemoteJobsSelect,
     RemoteSkillMapSkillTree,
@@ -104,112 +103,114 @@ import RemoteSkillMapSkillTree from '@/components//RemoteMapSkillTree/index.vue'
     timeFormat(value) {
       return dateFormatFromTableTime(value);
     }
-  }
-})
-@RouteConfig({
-  layout: true,
-  name: 'SkillMapManagement',
-  title: '技能图谱管理',
-})
-export default class App extends Vue {
-  tableData = [];
-  pageTotal = 0;
-  skillMapListReq = {
-    createTimeArea: [],
-    isEnable: null,
-    jobId: '',
-    name: '',
-    pageNumber: 1,
-    pageSize: 10,
-  };
-  previewVisible = false;
-  previewMapSkillName = '';
-  pickerOptions = {
-    shortcuts: [{
-      text: '最近一周',
-      onClick(picker) {
-        const end = new Date();
-        const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-        picker.$emit('pick', [start, end]);
+  },
+
+   data: function() {
+    return {
+      tableData : [],
+      pageTotal: 0,
+      skillMapListReq : {
+        createTimeArea: [],
+        isEnable: null,
+        jobId: '',
+        name: '',
+        pageNumber: 1,
+        pageSize: 10,
+      },
+      previewVisible : false,
+      previewMapSkillName : '',
+      pickerOptions : {
+        shortcuts: [{
+          text: '最近一周',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近一个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
+            picker.$emit('pick', [start, end]);
+          }
+        }, {
+          text: '最近三个月',
+          onClick(picker) {
+            const end = new Date();
+            const start = new Date();
+            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+            picker.$emit('pick', [start, end]);
+          }
+        }]
       }
-    }, {
-      text: '最近一个月',
-      onClick(picker) {
-        const end = new Date();
-        const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-        picker.$emit('pick', [start, end]);
       }
-    }, {
-      text: '最近三个月',
-      onClick(picker) {
-        const end = new Date();
-        const start = new Date();
-        start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-        picker.$emit('pick', [start, end]);
-      }
-    }]
-  };
-  mounted() {
-    // this.listPositions();
-    this.onSearch();
-  }
-  onSearch() {
-    const { createTimeArea, jobId, name, isEnable, pageSize, pageNumber } = this.skillMapListReq;
-    const condition = {};
-    if (isEnable === 0 || isEnable === 1) {
-      condition.isEnable = isEnable;
-    }
-    if (jobId) {
-      condition.jobId = jobId;
-    }
-    if (name) {
-      condition.name = name;
-    }
-    if (createTimeArea && createTimeArea.length > 1) {
-      condition.startTime = createTimeArea[0];
-      condition.endTime = createTimeArea[1];
-    }
-    condition.pageSize = pageSize;
-    condition.offset = pageNumber;
-    map.listByCondition(condition).then(res => {
-      this.tableData = res.data;
-      this.pageTotal = res.pages;
-    })
-  }
-  onCreateMap(id) {
-    this.$router.push('/system/skillMapNew');
-  }
-  onEnableGraph(row, status) {
-    row.isEnable = status;
-    map.update({ id:row.id, isEnable: status }).then(res => {
-      this.$message.success('修改启用状态成功');
-    })
-  }
-  onEditGraph(row) {
-    this.$router.push({ path: '/system/skillMapNew', query: { id: row.id } });
-  }
-  onDeleteGraph(row) {
-    this.$confirm(`确认删除图谱「${row.name}」吗？`)
-      .then(() => {
-        map.delete(row.id).then(() => {
-          this.$message.success('删除成功');
-          this.onSearch();
+    },
+
+    mounted() {
+      this.onSearch();
+    },
+
+    methods: {
+      onSearch() {
+        const { createTimeArea, jobId, name, isEnable, pageSize, pageNumber } = this.skillMapListReq;
+        const condition = {};
+        if (isEnable === 0 || isEnable === 1) {
+          condition.isEnable = isEnable;
+        }
+        if (jobId) {
+          condition.jobId = jobId;
+        }
+        if (name) {
+          condition.name = name;
+        }
+        if (createTimeArea && createTimeArea.length > 1) {
+          condition.createStartTime = createTimeArea[0];
+          condition.createEndTime = createTimeArea[1];
+        }
+        condition.pageSize = pageSize;
+        condition.pageNumber = pageNumber;
+        map.listByCondition(condition).then(res => {
+          this.tableData = res.data;
+          this.pageTotal = res.total;
         })
-      }).catch(() => {});
-  }
-  onChangePage(pageNumber) {
-    this.skillMapListReq.pageNumber = pageNumber;
-    this.onSearch();
-  }
-  onPreview(row) {
-    this.previewVisible = true;
-    this.previewMapSkillName = row.name + '预览';
-    this.$nextTick(() => {
-      this.$refs.mapSkillsTree.render({ mapId: row.id, isFinished: false });
-    });
-  }
+      },
+        onCreateMap(id) {
+          this.$router.push('/system/skillMapNew');
+        },
+        onEnableGraph(row, status) {
+          row.isEnable = status;
+          map.update(row.id, { isEnable: status }).then(res => {
+            this.$message.success('修改启用状态成功');
+          })
+        },
+        onEditGraph(row) {
+          this.$router.push({ path: '/system/skillMapNew', query: { id: row.id } });
+        },
+        onDeleteGraph(row) {
+          this.$confirm(`确认删除图谱「${row.name}」吗？`)
+            .then(() => {
+              map.delete(row.id).then(() => {
+                this.$message.success('删除成功');
+                this.onSearch();
+              })
+            }).catch(() => {});
+        },
+        onChangePage(pageNumber) {
+          this.skillMapListReq.pageNumber = pageNumber;
+          this.onSearch();
+        },
+        onPreview(row) {
+          this.previewVisible = true;
+          this.previewMapSkillName = row.name + '预览';
+          this.$nextTick(() => {
+            this.$refs.mapSkillsTree.render({ mapId: row.id, isFinished: false });
+          });
+        }
+    },
+  
 }
 </script>
 

@@ -71,18 +71,17 @@
   </div>
 </template>
 <script>
-import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import taskServer from '@/apis/task.js';
 import dayjs from 'dayjs';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 import SvgIcon from '@/components/svg-icon.vue';
 import StudyListPreview from '@/components/RemoteMapSkillTree/studyListPreview.vue';
-@Component({
+export default {
   components: {
     SvgIcon,
     StudyListPreview,
   },
-  data() {
+  data: function() {
     return {
       studyLists: {},
       checkParam: {
@@ -209,14 +208,6 @@ import StudyListPreview from '@/components/RemoteMapSkillTree/studyListPreview.v
       }
     }
   }
-})
-@RouteConfig({
-  layout: true,
-  name: 'SkillAuthManagement_StudyListDetail',
-  title: '学习清单详情',
-  hidden: true,
-})
-export default class App extends Vue {
 }
 </script>
 <style lang="scss" scoped>

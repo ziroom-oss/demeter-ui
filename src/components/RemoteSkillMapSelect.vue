@@ -19,7 +19,7 @@
 <script>
 import map from '@/apis/map';
 import portrait from '@/apis/portrait';
-import { getUserinfo } from '@ziroom/zcloud-head';
+//import { getUserinfo } from '@ziroom/zcloud-head';
 
 export default {
   model: {
