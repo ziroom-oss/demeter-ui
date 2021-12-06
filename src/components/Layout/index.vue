@@ -68,7 +68,7 @@
 // import { getAsyncRoutes } from '@ziroom/cherry2-starter-vue';
 import { Menu } from 'ant-design-vue';
 // import { getUserinfo, doOauthLogout } from "@ziroom/zcloud-head";
-import { routes } from '@/router/index.js';
+import store from '@/store/index.js';
 
 const SubMenu = {
   template: `
@@ -109,13 +109,19 @@ export default {
   mounted() {
     // 任意用户可见
     console.info(routes);
-    this.routes = routes[0].children;
   },
   watch: {
     '$route.path': {
       immediate: true,
       handler: function(path) {
         this.changeSelectedMenuItem(path);
+      }
+    },
+    'store.permission.state.routes': {
+      immediate: true,
+      deep: true,
+      handler: function(routes) {
+        this.routes = routes[0].children;
       }
     }
   },

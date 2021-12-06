@@ -15,14 +15,18 @@ import VXETable from 'vxe-table';
 import 'vxe-table/lib/style.css';
 
 import router from '@/router/index.js';
+import store from '@/store/index.js';
 
 import extendInstance from '@/common/extendInstance.js';
+
+import './permission.js';
 
 Vue.use(Antd).use(ElementUI).use(VXETable);
 
 Vue.config.productionTip = false;
 const app = new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app');
 
