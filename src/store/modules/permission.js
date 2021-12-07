@@ -37,6 +37,7 @@ export default {
     },
     SET_ROUTES(state, accessRoutes) {
       state.routes = routes[0].children.concat(accessRoutes[0].children);
+      //state.routes = accessRoutes[0].children;
     }
   },
   actions: {

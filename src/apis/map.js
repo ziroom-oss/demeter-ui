@@ -1,30 +1,30 @@
-import Request from './base';
+import Request from './Request';
 class Map {
   constructor() {
     this.http = new Request({ prefixURL: '/api/map' });
   }
 
   listByCondition(params) {
-    return this.http.post('/getSkillMapsByCondition', params);
+    return this.http.post('/condition', params);
   }
-  listAll(){
-    return this.http.get('/getAllSkillMap');
+  listAll() {
+    return this.http.get('/listall');
   }
 
-  update(map) {
-    return this.http.post('/update', map);
+  update(id, map) {
+    return this.http.patch('/' + id, map);
   }
 
   delete(id) {
-    return this.http.post('/deleteById?id=' + id);
+    return this.http.delete('/' + id);
   }
 
   save(map) {
-    return this.http.post('/add', map);
+    return this.http.post('/', map);
   }
 
   get(id) {
-    return this.http.get('/getSkillMapById?id=' + id);
+    return this.http.get('/' + id);
   }
 
   // 以下所有接口是 图谱+技能点相关
@@ -58,7 +58,7 @@ class Map {
   }
 
   // 技能图谱汇总数据
-  getSkillGraphData () {
+  getSkillGraphData() {
     return this.http.post('/data');
   }
 }

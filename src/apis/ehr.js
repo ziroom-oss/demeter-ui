@@ -5,30 +5,27 @@ class Ehr {
     this.http = new Request({ prefixURL: '/api/ehr' });
   }
 
-  getEmpList (params) {
+  getEmpList(params) {
     return this.http.post('/getEmpList', params);
   }
 
-  getAllThirdDept () {
-    return this.http.post('/thirdDept');
+  getOrgList() {
+    return this.http.get('/getOrgList');
   }
-  getOrgList (params) {
-    return this.http.post('/getOrgList', params);
+
+  getEmpListByDept(params) {
+    return this.http.post('/getEmpListByDept', params);
   }
-  getNextOrg (params) {
+
+  getNextOrg(params) {
     return this.http.post('/nextOrg', params);
   }
-  getCurrentUserDept () {
-    return this.http.post('/currentDept');
-  }
-  getPrincipalDeptTree () {
-    return this.http.post('/principalDeptTree');
-  }
-  getOrgByCode (params) {
+
+  getOrgByCode(params) {
     return this.http.post('/getOrgByCode', params);
   }
 
-  queryDetail (params) {
+  queryDetail(params) {
     return this.http.post('/queryDetail', params);
   }
 }

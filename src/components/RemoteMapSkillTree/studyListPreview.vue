@@ -8,7 +8,6 @@
 /**
  * study 提供添加和移除技能点、学习路径的功能
  */
-//import { getUserinfo } from '@ziroom/zcloud-head';
 import { cloneDeep } from 'lodash-es';
 import GraphTree from './GraphTree/index';
 import treeServer from '@/apis/tree';
@@ -18,7 +17,8 @@ export default {
     userId: {
       type: String,
       default: function() {
-        return getUserinfo().userInfo.uid;
+        const user = this.$store.state.permission?.userinfo;
+        return user.uid;
       }
     },
     skillPointModels: {

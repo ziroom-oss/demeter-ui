@@ -5,11 +5,11 @@ class PortraitPerson {
         this.http = new Request({ prefixURL: '/api/portrait/person' });
     }
 
-    getUserGrowingupInfo(param){
+    getUserGrowingupInfo(param) {
         return this.http.get('/growingup?uid=' + param);
     }
 
-    getDevlopPortraitData(param){
+    getDevlopPortraitData(param) {
         return this.http.post('/devlop', param);
     }
 
@@ -19,6 +19,14 @@ class PortraitPerson {
 
     getProjectPortraitData(param) {
         return this.http.post('/project', param);
+    }
+
+    getDailyTaskInfo(data) {
+        return this.http.post('task', data);
+    }
+
+    getSkillGraphData(param) {
+        return this.http.get('/portraitPersonSkillInfo?uid=' + param);
     }
 }
 

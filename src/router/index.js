@@ -11,17 +11,17 @@ export const routes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/EngineeringMetric',
+    redirect: '/EmployeePortrait',
     children: [
       {
-        path: 'EngineeringMetric',
-        name: 'EngineeringMetric',
+        path: 'EmployeePortrait',
+        name: 'EmployeePortrait',
         meta: {
-          title: '工程指标',
+          title: '画像信息',
           icon: 'code',
         },
-        component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/EngineerManagePanel/index.vue')
-      },
+        component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/Portrait/EmployeePortrait/index.vue'),
+      }
     ]
   },
   {
@@ -62,6 +62,7 @@ export const asyncRoutes = [
           }
         ]
       },
+      
     ]
   }
 ];

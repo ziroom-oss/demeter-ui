@@ -5,31 +5,31 @@ class SkillPoint {
     this.http = new Request({ prefixURL: '/api/skill' });
   }
 
-  saveSkillPoint (data) {
+  saveSkillPoint(data) {
     return this.http.post('/save', data);
   }
 
-  getSkillTask (id) {
+  getSkillTask(id) {
     return this.http.post('/get?id=' + id);
   }
 
-  updateSkillPoint (data) {
+  updateSkillPoint(data) {
     return this.http.post('/update', data)
   }
 
-  querySkillPoint (data) {
+  querySkillPoint(data) {
     return this.http.post('/query?skillTreeId=' + data);
   }
 
-  batchQuery (data) {
+  batchQuery(data) {
     return this.http.post('/batchQuery', data);
   }
 
-  getSkillPointsCheckList (data) {
+  getSkillPointsCheckList(data) {
     return this.http.post('/check/list', data);
   }
 
-  qa (data) {
+  qa(data) {
     return this.http.post('/q/a', data);
   }
 }

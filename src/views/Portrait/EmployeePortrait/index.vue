@@ -2,12 +2,50 @@
   <div>
     <p style="font-weight: bold; font-size: 18px">画像信息</p>
     <el-container>
+       <!--组织架构starter-->
+      <el-aside width="220px" v-if="roles.includes('') || roles.includes('demeter-super-admin')">
+        <div style="padding: 20px 0 0 0">
+          <el-select
+            v-model="selectUserCode"
+            placeholder="姓名查询"
+            filterable
+            remote
+            clearable
+            :loading="loading"
+            :remote-method="queryPeople"
+            size="small"
+            style="margin-bottom: 10px"
+          >
+            <el-option v-for="item in employeeList" :key="item.code" :label="item.name" :value="item.code"></el-option>
+          </el-select>
+          <div class="dept-header">
+            <span>组织架构</span>
+          </div>
+          <div class="dept-tree">
+            <el-tree
+              ref="depttree"
+              :props="props"
+              :load="loadNode"
+              :highlight-current="true"
+              node-key="code"
+              lazy
+              :default-checked-keys="defaultCheckedKeys"
+              :default-expanded-keys="defaultExpandedKeys"
+              :indent="4"
+              @node-click="handleNodeClick"
+            />
+          </div>
+        </div>
+      </el-aside>
+      <!--组织架构end-->
+      
       <el-main>
         <el-tabs type="card" @tab-click="handleClick" v-model="activeName">
+
           <el-tab-pane label="员工画像" name="portrayal">
             <p style="font-weight: bold; font-size: 18px">员工基本信息</p>
             <div style="display: flex;justify-content:space-between;flex-wrap:nowrap">
-              <el-form :model="userinfo" v-loading="loading">
+              <el-form :model="userinfo" >
                 <el-row :gutter="2">
                   <el-col :span="12">
                     <el-form-item label="姓名：" size="small">
@@ -46,8 +84,6 @@
                   </el-col>
                 </el-row>
               </el-form>
-              <!-- 六边形 -->
-              <div v-loading="loading" ref="radarChart" style="width: 300px; height: 300px;"></div>
             </div>
             <el-divider></el-divider>
             <div>
@@ -109,25 +145,16 @@
           </el-tab-pane>
 
 
-
           <el-tab-pane label="技能图谱" name="graph" lazy>
             <el-card>
               <el-row :gutter="20">
                 <el-col :span="6">
                   <span>认证技能点数量：</span>
-                  <span>{{ summaryData.authedSkillPointCount }}</span>
+                  <span>{{ summaryData.skillPointNum }}</span>
                 </el-col>
                 <el-col :span="6">
                   <span>认证技能数量：</span>
-                  <span>{{ summaryData.authedSkillCount }}</span>
-                </el-col>
-              </el-row>
-              <el-row style="margin-top: 15px">
-                <el-col :span="20">
-                  <span>技能图谱认证进度：</span>
-                  <el-link v-for="item in summaryData.skillGraph" :key="item.skillMap.id" :underline="false" type="primary">
-                    <span v-if="item.progress !== 0">{{ item.skillMap.name }}({{ MathCeil(item.progress * 100) }}%);</span>
-                  </el-link>
+                  <span>{{ summaryData.skillNum }}</span>
                 </el-col>
               </el-row>
             </el-card>
@@ -136,16 +163,11 @@
               <RemoteMapSkillTreePreview />
             </el-card>
           </el-tab-pane>
-         
+        
 
-
-
-
-          <el-tab-pane label="工程指标" name="metric" v-loading="loading">
+        <el-tab-pane label="工程指标" name="metric" v-loading="loading">
             <el-card>
               <div style="display: flex; justify-content: flex-start">
-                <el-button round size="mini" @click="nearlyMonth">近一个月</el-button>
-                <el-button round size="mini" @click="nearlyQuarter">近三个月</el-button>
                 <el-date-picker
                   style="margin-left: 15px"
                   @change="changeMetricDate()"
@@ -157,7 +179,7 @@
                   range-separator="至"
                   start-placeholder="开始日期"
                   end-placeholder="结束日期"
-                  :picker-options="pickerOptions">
+                  >
                 </el-date-picker>
               </div>
             </el-card>
@@ -319,23 +341,21 @@
               <div ref="projectChart1" style="text-align: center; width: 100%; height: 500px; border: 1px solid gray; padding: 20px"></div>
             </el-card>
           </el-tab-pane>
+
         </el-tabs>
       </el-main>
     </el-container>
   </div>
 </template>
-
 <script>
 
-import portraitServer from '@/apis/portrait.js';
+import NewEhrServer from '@/apis/newEhr.js';
+import moment from 'moment';
+import PortraitPerson from '@/apis/portraitPerson.js';
 import authServer from '@/apis/authorize.js';
 import ehrServer from '@/apis/ehr.js';
-import NewEhrServer from '@/apis/newEhr.js';
-import PortraitPerson from '@/apis/portraitPerson.js';
 import { isEmpty } from 'lodash-es';
-import mapServer from '@/apis/map.js'
 import RemoteMapSkillTreePreview from '@/components/RemoteMapSkillTree/preview.vue';
-
 const echarts = require('echarts/lib/echarts');
 require('echarts/lib/component/tooltip');
 require('echarts/lib/component/legend');
@@ -361,35 +381,40 @@ var skillAuthCountOption;
 var skillGraphCountOption;
 var engineeringMetricOption;
 var projectCharts1Option;
+var projectCharts2Option;
+var projectCharts3Option;
+var periodCharts1Option;
+var periodCharts2Option;
+var relationChartOption;
+var behaviorChartOption;
+var deptTree = '';
 
 export default {
- components: {
+  components: {
     RemoteMapSkillTreePreview,
   },
-
-   watch: {
+  watch: {
     selectUserCode: {
       handler(val) {
         if (this.selectTab === 'portrayal') {
           this.activePortrayalInfo()
         }
         if (this.selectTab === 'graph') {
-          mapServer.getSkillGraphData().then(res => {
-            console.log(res);
+          //let uid = this.selectUserCode;
+          let user = this.$store.state.permission?.userinfo;
+          let uid = user.uid;
+          PortraitPerson.getSkillGraphData(uid).then(res => {
+            this.summaryData = res
           })
         }
         if (this.selectTab === 'task') {
           this.drawTask()
         }
         if (this.selectTab === 'metric') {
-          //个人表现展现
-          this.getDevlopPortraitData();
-          //描绘个人开发表现雷达图
-          this.activeMetricRadar()
+          this.changeMetricDate();
         }
       }
     },
-
     mapSelect: {
       deep: true,
       handler(value) {
@@ -402,13 +427,21 @@ export default {
       }
     }
   },
-
+  created () {
+    this.getCurrentRole();
+    this.getCurrentUid();
+    this.loadTree()
+  },
+  mounted () {
+    this.activePortrayalInfo();
+  },
   data: function() {
     return {
       PortraitDevlopTeam:[],
       PortraitPersonGrowingupRespVOs:[],
       PortraitPersonDevlopRespVO:{},
-      projectCharts1: '',
+      
+      employeeList: [],
       graphZoomOrigin: 1, // 用于存放 graph 缩放大小
       isSavingPicture: false, // 是否正在保存图片中
 
@@ -439,114 +472,89 @@ export default {
       skillAuthCountCharts: '',
       skillGraphCountCharts: '',
       metricRadarCharts: '',
+      projectCharts1: '',
+      projectCharts2: '',
+      projectCharts3: '',
+      periodCharts1: '',
+      periodCharts2: '',
+      relationCharts: '',
+      behaviorCharts: '',
       activeName: 'portrayal',
       activeLine: 'growthValue',
       taskDate: [new Date(2020, 12, 1), new Date(2021, 11, 31)],
       lineDate: [new Date(2020, 12, 1), new Date(2021, 11, 31)],
       metricDate: [new Date(2020, 12, 1), new Date(2021, 11, 31)],
+      engineering: {
+        personalByProject: {},
+        personalProjectResp: {},
+        personalResp: {},
+        personOverview: {}
+      },
+      roles: [],
+      props: {
+        children: 'children',
+        label: 'name',
+        isLeaf: 'isLeaf'
+      },
+      defaultCheckedKeys: [],
+      defaultExpandedKeys: [],
+      noDeptCodes: [],
       selectUserCode: this.getCurrentUid(),
       selectTab: 'portrayal',
-      pickerOptions: {
-        shortcuts: [{
-          text: '最近一周',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近一个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-            picker.$emit('pick', [start, end]);
-          }
-        }, {
-          text: '最近三个月',
-          onClick(picker) {
-            const end = new Date();
-            const start = new Date();
-            start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
-            picker.$emit('pick', [start, end]);
-          }
-        }]
-      },
     }
   },
 
-  mounted () {
-    this.activePortrayalInfo();
-  },
-
   methods: {
-    convertSecond2Hour (s) {
-      return this.MathCeil(s / (60 * 60));
+
+     //个人基本信息展现
+    getPortraitPersonInfo(){
+        //用户code
+        let uid = this.selectUserCode;
+        console.log(uid)
+        NewEhrServer.getPortraitUserInfo(uid).then(res => {
+          this.userinfo = res;
+        }).catch((error) => {
+          console.log(error);
+        })
     },
-    
-    MathCeil (val) {
-      return Math.ceil(val)
+
+    //个人成长指标信息展现
+    getUserGrowingupInfo(){
+        //用户code
+        let uid = this.selectUserCode;
+        PortraitPerson.getUserGrowingupInfo(uid).then(res => {
+          this.PortraitPersonGrowingupRespVOs=res;
+        }).catch((error) => {
+          console.log(error);
+        })
     },
-    saveToPng() {
-      const graph = this.$refs.mapSkillTree.getThisGrpah();
-      if (!graph) {
-        return this.$message.warning('技能图谱不存在，请先选择职务');
-      }
-      this.isSavingPicture = true;
-      this.graphZoomOrigin = graph.getZoom();
-      graph.zoomTo(1.3);
-      graph.downloadFullImage(this.mapSelect.mapId, 'image/png');
-      setTimeout(() => {
-        graph.zoomTo(this.graphZoomOrigin);
-        graph.fitCenter();
-        this.isSavingPicture = false;
-      }, 2500);
+
+    //工程指标
+    changeMetricDate () {
+      this.tabMertic();
     },
-    nearlyMonth () {
-      this.metricDate = []
+    tabMertic(){
+      
+      let startTime = moment(this.metricDate.length ? this.metricDate[0] : new Date(2021, 1, 1)).format('YYYY-MM-DD');
+      let endTime = moment(this.metricDate.length ? this.metricDate[1] : new Date(2021, 12, 31)).format('YYYY-MM-DD');
+        let params = {
+          uid: this.selectUserCode,
+          startTime: startTime,
+          endTime: endTime,
+        }
+        //个人表现展现
+        this.getDevlopPortraitData(params);
+        //描绘个人表现雷达图
+        this.activeMetricRadar(params);
+        //个人项目表现
+        this.activeProjectChart(params);
     },
-    nearlyQuarter () {
-      this.metricDate = []
-    },
-    
-    //个人工程指标-项目表现
-    activeProjectChart (params) {
-      //个人在项目的表现
-      PortraitPerson.getProjectPortraitData(params).then(res => {
-          let list = res;
-          this.projectCharts1 = echarts.init(this.$refs.projectChart1)
-          this.projectCharts1.setOption(projectCharts1Option = {
-            title: {
-              text: '开发当量',
-              subtext: '',
-              left: 'center'
-            },
-            tooltip: {
-              trigger: 'item',
-              formatter: '{a} <br/>{b} : {c} ({d}%)'
-            },
-            legend: {
-              top: 'bottom',
-              left: 'center'
-            },
-            series: [
-              {
-                name: '',
-                type: 'pie',
-                radius: '50%',
-                center: ['50%', '50%'],
-                data: list,
-                emphasis: {
-                  itemStyle: {
-                    shadowBlur: 10,
-                    shadowOffsetX: 0,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                  }
-                }
-              }
-            ]
-          })
+
+    //个人工程指标
+    getDevlopPortraitData(params){
+        PortraitPerson.getDevlopPortraitData(params).then(res => {
+          console.log(res);
+          this.PortraitPersonDevlopRespVO=res;
         }).catch((error) => {
           console.log(error);
         })
@@ -654,29 +662,200 @@ export default {
       })
     },
 
-    //工程指标tab
-    changeMetricDate(){
-      this.tabMertic();
+    //个人工程指标-项目表现
+    activeProjectChart (params) {
+      //个人在项目的表现
+      PortraitPerson.getProjectPortraitData(params).then(res => {
+          let list = res;
+          this.projectCharts1 = echarts.init(this.$refs.projectChart1)
+          this.projectCharts1.setOption(projectCharts1Option = {
+            title: {
+              text: '开发当量',
+              subtext: '',
+              left: 'center'
+            },
+            tooltip: {
+              trigger: 'item',
+              formatter: '{a} <br/>{b} : {c} ({d}%)'
+            },
+            legend: {
+              top: 'bottom',
+              left: 'center'
+            },
+            series: [
+              {
+                name: '',
+                type: 'pie',
+                radius: '50%',
+                center: ['50%', '50%'],
+                data: list,
+                emphasis: {
+                  itemStyle: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                  }
+                }
+              }
+            ]
+          })
+        }).catch((error) => {
+          console.log(error);
+        })
     },
 
+
+    convertSecond2Hour (s) {
+      return this.MathCeil(s / (60 * 60));
+    },
+
+
+    queryPeople (query) {
+      ehrServer.getEmpList({ empCodeNameAdcode: query }).then(data => {
+        this.employeeList = data.map(user => {
+          return {
+            code: user.code,
+            email: user.email,
+            name: user.name + '(' + user.email.split('@')[0] + ')'
+          };
+        });
+      }).catch((err) => {
+      });
+    },
+
+
+    MathCeil (val) {
+      return Math.ceil(val)
+    },
+    saveToPng() {
+      const graph = this.$refs.mapSkillTree.getThisGrpah();
+      if (!graph) {
+        return this.$message.warning('技能图谱不存在，请先选择职务');
+      }
+      this.isSavingPicture = true;
+      this.graphZoomOrigin = graph.getZoom();
+      graph.zoomTo(1.3);
+      graph.downloadFullImage(this.mapSelect.mapId, 'image/png');
+      setTimeout(() => {
+        graph.zoomTo(this.graphZoomOrigin);
+        graph.fitCenter();
+        this.isSavingPicture = false;
+      }, 2500);
+    },
+    activePeriodChart (list) {
+      this.periodCharts1 = echarts.init(this.$refs.periodChart1)
+      this.periodCharts1.setOption(periodCharts1Option = {
+        xAxis: {
+          type: 'category',
+          data: list.filter(i => i.devEquivalent !== 0).map(i => i.day)
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [{
+          data: list.filter(i => i.devEquivalent !== 0).map(i => i.devEquivalent),
+          type: 'bar',
+          label: {
+            show: true,
+            showBackground: true,
+            backgroundStyle: {
+                color: 'rgba(180, 180, 180, 0.2)'
+            },
+            position: 'outside'
+          },
+        }]
+      })
+    },
+    
     handleNodeClick (data) {
       if (data.isLeaf) {
         this.selectUserCode = data.code;
       }
     },
-    getCurrentUid () {
-      const user = '60033587';
-      return user.userInfo.uid
+
+    async loadTree() {
+      // 该用户没有部门树，主动查询该用户部门树
+       NewEhrServer.getUserInfo().then(data => {
+        const user =  data;
+        this.selectUserCode = user.userCode;
+        let currentUserCode = this.selectUserCode;
+        if (isEmpty(deptTree)) {
+            ehrServer.queryDetail({userCode: currentUserCode}).then(data => {
+            this.defaultExpandedKeys = (data.treePath && data.treePath.split("/")) || ['101'];
+          }).catch(() => {
+          });
+        }
+        this.currentUserKey = currentUserCode;
+        this.defaultCheckedKeys = [currentUserCode]
+        })
     },
+
+    async loadNode (node, resolve) {
+      if (node.level === 0) {
+        const data = await ehrServer.getOrgList();
+        const dept = (data) || null;
+        if (!dept) {
+          return resolve([]);
+        }
+        return resolve([dept]);
+      }
+      let results = [];
+      const { code } = node.data;
+      const users = await ehrServer.getEmpListByDept({
+        orgCode: code,
+        empCodeNameAdcode: '',
+      }).catch(err => {
+        this.$message({ type: 'error', message: '查询部门人员异常: ' + err.message });
+        throw err;
+      });
+      if (users && users.length) {
+        results.push(...users.map(user => {
+          if (user.code === this.currentUserKey) {
+            this.currentNodeKey = user.code;
+          }
+          return {
+            code: user.code,
+            name: user.name,
+            isUser: true,
+            isLeaf: true,
+          };
+        }));
+      }
+      const deptList = await ehrServer.getNextOrg({ deptId: code });
+      if (deptList && deptList.length) {
+        results = results.concat(deptList);
+      }
+      return resolve(results);
+    },
+
+
+    getCurrentRole () {
+      authServer.getAuthorize().then(data => {
+        this.roles = data.roles;
+      })
+    },
+
+    getCurrentUid () {
+      NewEhrServer.getUserInfo().then(data => {
+        const user =  data;
+        this.selectUserCode = user.userCode;
+        console.log(this.selectUserCode);
+        return user.userCode;
+      })
+    },
+
     handleClick (tab, event) {
       this.selectTab = tab.name
       if (tab.name === 'portrayal') {
         this.activePortrayalInfo()
       }
       if (tab.name === 'graph') {
-        mapServer.getSkillGraphData().then(res => {
-          this.summaryData = res
-        })
+         //let uid = this.selectUserCode;
+        let user = this.$store.state.permission?.userinfo;
+         let uid = user.uid;
+          PortraitPerson.getSkillGraphData(uid).then(res => {
+            this.summaryData = res
+          })
       }
       if (tab.name === 'task') {
         if (this.$refs.receiveChart) {
@@ -689,89 +868,14 @@ export default {
       }
       if (tab.name === 'metric') {
         this.$nextTick(() => {
-          this.tabMertic();
+           this.tabMertic();
         })
       }
     },
-
-    tabMertic(){
-        let params = {
-          uid: this.selectUserCode,
-          startTime: this.lineDate[0] === undefined ? this.getFirstDayOfMonth() : this.lineDate[0],
-          endTime: this.lineDate[1] === undefined ? this.getLastDayMonth() : this.lineDate[1],
-        }
-        //个人表现展现
-        this.getDevlopPortraitData(params);
-        //描绘个人表现雷达图
-        this.activeMetricRadar(params);
-        //个人项目表现
-        this.activeProjectChart(params);
-    },
-
 
     activePortrayalInfo () {
-      this.loading = true;
-      let params = {
-        uid: this.selectUserCode,
-        startTime: this.lineDate[0] === undefined ? this.getFirstDayOfMonth() : this.lineDate[0],
-        endTime: this.lineDate[1] === undefined ? this.getLastDayMonth() : this.lineDate[1],
-      }
       this.getPortraitPersonInfo();
       this.getUserGrowingupInfo();
-      portraitServer.getPortrayalInfo(params).then(data => {
-        this.loading = false;
-        this.growthInfo = data.growthInfo;
-        this.radarGraphs = data.radarGraphs;
-        const graphData = data.radarGraphs;
-        if (graphData) {
-          this.radarValues = graphData.map(r => {
-            return r.max
-          })
-          const max = Math.max(...this.radarValues)
-          this.radarTexts = graphData.map(r => {
-            return {
-              text: r.text,
-              max: max
-            }
-          })
-        } else {
-          this.radarValues = []
-        }
-        // this.activeGrowthValue()
-        this.drawRadar()
-      }).catch(() => {
-        this.loading = false;
-      })
-    },
-
-    //个人基本信息展现
-    getPortraitPersonInfo(){
-        //当前登录人
-        let uid = "xxx";
-        NewEhrServer.getUserInfo(uid).then(res => {
-          this.userinfo = res;
-        }).catch((error) => {
-          console.log(error);
-        })
-    },
-
-    //个人成长指标信息展现
-    getUserGrowingupInfo(){
-        //当前登录人
-        let uid = "xxx";
-        PortraitPerson.getUserGrowingupInfo(uid).then(res => {
-          this.PortraitPersonGrowingupRespVOs=res;
-        }).catch((error) => {
-          console.log(error);
-        })
-    },
-
-    getDevlopPortraitData(params){
-        PortraitPerson.getDevlopPortraitData(params).then(res => {
-          this.PortraitPersonDevlopRespVO=res;
-        }).catch((error) => {
-          console.log(error);
-        })
     },
 
     getFirstDayOfMonth () {
@@ -779,6 +883,7 @@ export default {
       date.setDate(1);
       return date;
     },
+
     getLastDayMonth (){
       var date = new Date();
       var currentMonth = date.getMonth();
@@ -787,62 +892,7 @@ export default {
       var oneDay = 1000 * 60 * 60 * 24;
       return new Date(nextMonthFirstDay - oneDay);
     },
-    handleLineClick (tab, event) {
-      if (tab.name === 'growthValue') {
-        this.activeGrowthValue()
-      }
-      if (tab.name === 'assignTaskCount') {
-        this.activeAssignTaskCount()
-      }
-      if (tab.name === 'skillValue') {
-        this.activeSkillValue();
-      }
-      if (tab.name === 'skillTaskCount') {
-        this.activeSkillTaskCount();
-      }
-      if (tab.name === 'skillAuthCount') {
-        this.activeSkillAuthCount();
-      }
-      if (tab.name === 'skillGraphCount') {
-        this.activeSkillGraphCount();
-      }
-    },
-    activeGrowthValue () {
-      this.growthValueCharts = echarts.init(this.$refs.growthValueChart)
-      let arr = [];
-      const n = this.growthInfo.growthValueAcc.length;
-      for (let i = 0; i < n; i++) {
-        arr.push([this.growthInfo.growthValueDate[i], this.growthInfo.growthValueAcc[i]]);
-      }
-      this.growthValueCharts.setOption(growthValueOption = {
-        xAxis: {
-          type: 'time',
-          minInterval: 3600 * 24 * 1000,
-          interval: 3600 * 24 * 1000,
-          max: new Date(Math.max.apply(null, this.growthInfo.growthValueDate)),
-          min: new Date(Math.min.apply(null, this.growthInfo.growthValueDate)),
-          axisLabel: {
-            formatter: '{yyyy}-{MM}-{dd}'
-          },
-          rich: {
-            yearStyle: {
-              color: '#000',
-              fontWeight: 'bold'
-            },
-            monthStyle: {
-              color: '#999'
-            }
-          }
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [{
-          type: 'line',
-          data: arr
-        },]
-      }, true);
-    },
+
     activeAssignTaskCount () {
       this.assignTaskCountCharts = echarts.init(this.$refs.assignTaskCountChart)
       this.assignTaskCountCharts.setOption(assignTaskCountOption = {
@@ -859,75 +909,7 @@ export default {
         }]
       }, true);
     },
-    activeSkillValue () {
-      this.skillValueCharts = echarts.init(this.$refs.skillValueChart)
-      this.skillValueCharts.setOption(skillValueOption = {
-        xAxis: {
-            type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [{
-            data: [150, 230, 224, 218, 12, 147, 260],
-            type: 'line'
-        }]
-      }, true);
-    },
-    activeSkillTaskCount () {
-      this.skillTaskCountCharts = echarts.init(this.$refs.skillTaskCountChart)
-      this.skillTaskCountCharts.setOption(skillTaskCountOption = {
-        xAxis: {
-            type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [{
-            data: [150, 230, 224, 455, 135, 147, 260],
-            type: 'line'
-        }]
-      }, true);
-    },
-    activeSkillAuthCount () {
-      this.skillAuthCountCharts = echarts.init(this.$refs.skillAuthCountChart)
-      this.skillAuthCountCharts.setOption(skillAuthCountOption = {
-        xAxis: {
-            type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [{
-            data: [150, 230, 224, 218, 135, 147, 678],
-            type: 'line'
-        }]
-      }, true);
-    },
-    activeSkillGraphCount () {
-      this.skillGraphCountCharts = echarts.init(this.$refs.skillGraphCountChart)
-      this.skillGraphCountCharts.clear()
-      this.skillGraphCountCharts.setOption(skillGraphCountOption = {
-        xAxis: {
-            type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        },
-        yAxis: {
-            type: 'value'
-        },
-        series: [{
-            data: [150, 230, 224, 218, 135, 147, 260],
-            type: 'line'
-        }]
-      }, true);
-    },
-    changeTaskDate () {
-      this.drawTask()
-    },
-   
+
     refresh () {
     },
     query () {
@@ -971,7 +953,7 @@ export default {
         startTime: this.taskDate[0],
         endTime: this.taskDate[1]
       }
-      portraitServer.getDailyTaskInfo(params).then(data => {
+      PortraitPerson.getDailyTaskInfo(params).then(data => {
         console.log(data);
         this.receivedCount = data.receivedCount
         this.releasedCount = data.releasedCount
@@ -996,9 +978,6 @@ export default {
                 text: '我接受的任务统计',
                 left: 'center'
             },
-            // tooltip: {
-            //   trigger: 'item'
-            // },
             legend: {
               top: 'bottom',
               left: 'center'
@@ -1015,8 +994,6 @@ export default {
                   borderWidth: 2
                 },
                 label: {
-                  // show: false,
-                  // position: 'center'
                   formatter: '{b|{b}：}{c}  {per|{d}%}  ',
                   backgroundColor: '#F6F8FC',
                   borderColor: '#8C8D8E',
@@ -1110,7 +1087,6 @@ export default {
     },
   }
 }
-
 </script>
 <style>
 .growthinfo-layout {

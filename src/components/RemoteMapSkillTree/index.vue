@@ -32,13 +32,11 @@
 
 <script>
 import map from '@/apis/map.js';
-import mapSkill from '@/apis/mapSkill.js';
 import tree from '@/apis/tree.js';
 import G6 from '@antv/g6';
 import { buildTreeByNodes, graphInit, registerNode, dataTransform } from './index.js';
 import { cloneDeep } from 'lodash-es';
 import skillPointServer from '@/apis/skill.js';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 const echarts = require('echarts/lib/echarts');
 
 export default {
@@ -169,7 +167,7 @@ export default {
         this.mapSkills = mapSkills;
       } else {
         if (!this.mapId) return this.$message.warning('mapId 和 mapSkills 必须至少传入一个');
-        this.mapSkills = await mapSkill.getMapSkillTreeByMapId(this.mapId);
+        this.mapSkills = await map.getMapSkillTreeByMapId(this.mapId);
       }
       
       if (!this.mapSkills || this.mapSkills.length < 1) {
@@ -213,7 +211,8 @@ export default {
         // mapSkillsClone[0].进行中 = true;
         // console.log(mapSkillsClone);
         const skillIds = mapSkillsClone.map(i => i.skillTaskId);
-        const uid = (!userid) ? getUserinfo().userInfo.uid : userid;
+        const user = this.$store.state.permission?.userinfo;
+        const uid = (!userid) ? user.uid : userid;
         await skillPointServer.batchQuery({
           skillIds: skillIds,
           uid,

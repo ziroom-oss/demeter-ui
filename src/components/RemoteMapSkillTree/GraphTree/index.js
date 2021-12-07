@@ -44,7 +44,7 @@ function buildTreeByNodes(nodes, source) {
       recuriveSetPath(memo[node.parentId], memo);
     }
   }
-  Object.entries(memo).forEach(function([key, value]) {
+  Object.entries(memo).forEach(function ([key, value]) {
     if (!value.path) {
       delete memo[key]
     }
@@ -153,8 +153,8 @@ export function registerNode() {
     },
     getAnchorPoints() {
       return [
-          [0, 0.5],
-          [1, 0.5],
+        [0, 0.5],
+        [1, 0.5],
       ]
     },
   }, 'single-node');
@@ -176,8 +176,8 @@ export function registerNode() {
     },
     getAnchorPoints() {
       return [
-          [0, 0.965],
-          [1, 0.965],
+        [0, 0.965],
+        [1, 0.965],
       ]
     }
   }, 'single-node')
@@ -208,10 +208,10 @@ export function registerNode() {
             <rect style={{width: ${width + 24}, height: 22}} keyshape>
                 <text style={{fontSize: 14, marginLeft: 12, marginTop: 6}}>${cfg.name}</text>
                 ${cfg.isDynamicLeaf
-                  ? `<text style={{ marginLeft: ${width - 8}, marginTop: -10, stroke: ${color}, fill: '#000', cursor: 'pointer', opacity: ${cfg.hover ? 0.75 : 0}, next: 'inline' }}
+          ? `<text style={{ marginLeft: ${width - 8}, marginTop: -10, stroke: ${color}, fill: '#000', cursor: 'pointer', opacity: ${cfg.hover ? 0.75 : 0}, next: 'inline' }}
                       action="remove">&nbsp&nbsp移除</text>`
-                  : ''
-                }
+          : ''
+        }
             </rect>
             <rect style={{ fill: ${color}, width: ${width + 24}, height: 2, x: 0, y: 22 }} />
         </group>
@@ -219,8 +219,8 @@ export function registerNode() {
     },
     getAnchorPoints() {
       return [
-          [0, 0.965],
-          [0, 0.965],
+        [0, 0.965],
+        [0, 0.965],
       ]
     }
   }, 'single-node');

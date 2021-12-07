@@ -5,65 +5,65 @@ class Task {
     this.http = new Request({ prefixURL: '/api/task' });
   }
 
-  saveAssign (data) {
+  saveAssign(data) {
     return this.http.post('/save/assign', data);
   }
 
-  getAssignTask (id) {
+  getAssignTask(id) {
     return this.http.post('/get/assign?id=' + id);
   }
 
-  editAssign (data) {
+  editAssign(data) {
     return this.http.post('/update/assign', data);
   }
 
-  editSkill (data) {
+  editSkill(data) {
     return this.http.post('/update/skill', data);
   }
 
-  changeTaskStatus (id, type, status) {
+  changeTaskStatus(id, type, status) {
     return this.http.post('/status/assign?taskId=' + id + '&taskType=' + type + '&taskStatus=' + status);
   }
 
-  getAllTaskTypes () {
+  getAllTaskTypes() {
     return this.http.get('/type/all');
   }
 
-  getAllAssignStatus () {
+  getAllAssignStatus() {
     return this.http.get('/status/assign');
   }
 
-  getAllSkillStatus () {
+  getAllSkillStatus() {
     return this.http.get('/status/skill');
   }
 
-  getAllAssignFlowStatus () {
+  getAllAssignFlowStatus() {
     return this.http.get('/status/flow/assign');
   }
 
-  getAllSkillFlowStatus () {
+  getAllSkillFlowStatus() {
     return this.http.get('/status/flow/skill');
   }
 
-  getAllSkillLevel () {
+  getAllSkillLevel() {
     return this.http.get('/skill/level');
   }
 
-  releaseList (data) {
+  releaseList(data) {
     return this.http.post('/list/release', data);
   }
 
-  receiveList (data) {
+  receiveList(data) {
     return this.http.post('/list/receive', data);
   }
 
-  getTaskDetail (taskId, taskType) {
+  getTaskDetail(taskId, taskType) {
     return this.http.post('/detail/all?taskId=' + taskId + "&taskType=" + taskType);
   }
-  getStudyListDetail(manifestid){
-    return this.http.post('/get/skill/manifest/detail?manifestId='+ manifestid);
+  getStudyListDetail(manifestid) {
+    return this.http.post('/get/skill/manifest/detail?manifestId=' + manifestid);
   }
-  createManifest (data) {
+  createManifest(data) {
     return this.http.post('/create/skill/manifest', data);
   }
   modifyManifest(data) {
@@ -88,15 +88,15 @@ class Task {
   //   return this.http.post('/receiver/list?taskId=' + taskId + "&taskType=" + taskType);
   // }
 
-  acceptTask (taskId, taskType) {
+  acceptTask(taskId, taskType) {
     return this.http.post('/accept?id=' + taskId + "&type=" + taskType);
   }
 
-  rejectTask (data) {
+  rejectTask(data) {
     return this.http.post('/reject', data);
   }
 
-  getRejectReason (data) {
+  getRejectReason(data) {
     return this.http.post('/reject/reason', data);
   }
 
@@ -104,40 +104,40 @@ class Task {
     return this.http.post('/reassign', data);
   }
 
-  submitCheckTask (taskId, taskType) {
+  submitCheckTask(taskId, taskType) {
     return this.http.post('/submit/auth?taskId=' + taskId + "&taskType=" + taskType);
   }
 
-  submitComplete (taskId) {
+  submitComplete(taskId) {
     return this.http.post('/submit/complete?taskId=' + taskId);
   }
 
-  checkTask (data) {
+  checkTask(data) {
     return this.http.post('/auth', data);
   }
 
-  finishTaskCondition (id) {
+  finishTaskCondition(id) {
     return this.http.post('/condition/finish?id=' + id);
   }
 
-  getTaskProgress (id) {
+  getTaskProgress(id) {
     return this.http.post('/detail/progress?id=' + id);
   }
 
-  searchTask (condition) {
+  searchTask(condition) {
     return this.http.post('/graph/search?condition=' + condition);
   }
 
-  submitSkillMove (id, skillTreeId) {
+  submitSkillMove(id, skillTreeId) {
     return this.http.post('/skill/move?id=' + id + "&skillTreeId=" + skillTreeId);
   }
 
-  uploadLearningOutcome (data) {
+  uploadLearningOutcome(data) {
     return this.http.post('/upload/outcome', data);
   }
 
   //展示登录用户分配出的学习清单
-  getStudyListCurUser(data){
+  getStudyListCurUser(data) {
     return this.http.post('/list/skill/manifest', data);
   }
 

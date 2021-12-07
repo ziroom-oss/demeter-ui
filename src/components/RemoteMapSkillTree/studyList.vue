@@ -34,7 +34,6 @@
  * 当 url 携带参数 query.id 则是编辑模式，对学习清单增删技能节点和学习路径都是远程操作的
  * 普通模式下是没有远程操作，除了提交整棵编辑完整的学习清单
  */
-//import { getUserinfo } from '@ziroom/zcloud-head';
 import { cloneDeep } from 'lodash-es';
 import GraphTree from './GraphTree/index';
 import treeServer from '@/apis/tree';
@@ -45,7 +44,8 @@ export default {
     userId: {
       type: String,
       default: function() {
-        return getUserinfo().userInfo.uid;
+        const user = this.$store.state.permission?.userinfo;
+        return user.uid;
       }
     },
     skillPointModels: {

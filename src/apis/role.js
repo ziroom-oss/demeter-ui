@@ -1,11 +1,11 @@
-import Request from './base';
+import Request from './Request';
 class Role {
   constructor() {
     this.http = new Request({ prefixURL: '/api/role' });
   }
 
-  queryRoleList() {
-    return this.http.post('/queryRoleList');
+  queryRoleList(data) {
+    return this.http.post('/query', data);
   }
 }
 

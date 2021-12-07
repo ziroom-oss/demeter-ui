@@ -18,8 +18,6 @@
 
 <script>
 import map from '@/apis/map';
-import portrait from '@/apis/portrait';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 
 export default {
   model: {
@@ -51,19 +49,7 @@ export default {
   },
   async mounted() {
     await this.listGraphs();
-    const userinfo = getUserinfo().userInfo;
-    portrait.getUserDetail(userinfo.uid).then(res => {
-      const jobId = Number(res.jobId) || null;
-      console.log(this.options);
-      const option = this.options.find(opt => Number(opt.jobId) === jobId);
-      console.log("option: "+option);
-      console.log("jobId: "+jobId);
-      if (option) {
-        this.$emit('change', option.id);
-      } else {
-        this.$emit('change', this.options[0].id);
-      }
-    })
+    this.$emit('change', this.options[0].id);
   },
   methods: {
     onChange(value) {

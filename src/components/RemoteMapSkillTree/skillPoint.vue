@@ -51,7 +51,6 @@
  */
 import RemoteSkillMapSelect from '@/components/RemoteSkillMapSelect.vue';
 import RemoteJobLevelsSelect from '@/components/RemoteJobLevelsSelect.vue';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 import mixin from './mixin';
 import { cloneDeep } from 'lodash-es';
 
@@ -65,7 +64,8 @@ export default {
     userId: {
       type: String,
       default: function() {
-        return getUserinfo().userInfo.uid;
+        const user = this.$store.state.permission?.userinfo;
+        return user.uid;
       }
     }
   },

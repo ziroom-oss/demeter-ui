@@ -39,7 +39,7 @@ export function buildTreeByNodes(nodes, mapSkills) {
     }
   }
   // 删除没有标记的节点
-  Object.entries(memo).forEach(function([key, value]) {
+  Object.entries(memo).forEach(function ([key, value]) {
     if (!value.path) {
       delete memo[key]
     }
@@ -136,8 +136,8 @@ export function registerNode() {
     },
     getAnchorPoints() {
       return [
-          [0, 0.5],
-          [1, 0.5],
+        [0, 0.5],
+        [1, 0.5],
       ]
     },
   }, 'single-node');
@@ -156,8 +156,8 @@ export function registerNode() {
     },
     getAnchorPoints() {
       return [
-          [0, 0.965],
-          [1, 0.965],
+        [0, 0.965],
+        [1, 0.965],
       ]
     }
   }, 'single-node')
@@ -189,8 +189,8 @@ export function registerNode() {
     },
     getAnchorPoints() {
       return [
-          [0, 0.965],
-          [0, 0.965],
+        [0, 0.965],
+        [0, 0.965],
       ]
     }
   }, 'single-node');

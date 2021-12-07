@@ -1,19 +1,23 @@
 import HttpAxios from "@/common/utils/HttpAxios";
-// import { getOauthToken, doOauthLogout } from "@ziroom/zcloud-head";
 import { Message } from "element-ui";
+import store from '@/store';
 
 const requestDefaultInterceptor = function (config) {
-  /** 补充 */
+  // 补充
   // config.headers['X-ZCLOUD-TOKEN'] = getOauthToken();
-  if (process.env.VUE_ENV_CONFIG === 'dev') {
+  if (process.env.VUE_APP_ENV_CONFIG === 'dev') {
     config.baseURL = '';
     config.url = '/dev' + config.url;
+  }
+
+  const token = store.state.permission.token;
+  if (token) {
+    config.headers.Authorization = token;
   }
   return config;
 }
 
 const responseDefaultInterceptor = function (response) {
-  // console.info(response);
   if (response.data.code !== '200') {
     Message.warning(response.data.message || '不存在 MESSAGE 或者是接口错误');
     return Promise.reject(new Error(response.data.message));

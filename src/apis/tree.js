@@ -1,36 +1,36 @@
-import Request from './base';
+import Request from './Request';
 import { Message } from 'element-ui';
 class Tree {
   constructor() {
     this.http = new Request({ prefixURL: '/api/tree' });
   }
 
-  create(param) {
-    return this.http.post('/create', param);
+  create(tree) {
+    return this.http.post('/', tree);
   }
 
-  get(treeId) {
-    return this.http.get('/getTreeNodeById?treeId=' + treeId);
+  get(id) {
+    return this.http.get('/' + id);
   }
 
-  update(param) {
-    return this.http.post('/update', param);
+  update(id, tree) {
+    return this.http.patch('/' + id, tree);
   }
 
-  delete(treeId) {
-    return this.http.post('/deleteById?treeId=' + treeId);
+  delete(id) {
+    return this.http.delete('/' + id);
   }
 
-  getNodesByParentId(parentId) {
-    return this.http.get('/getTreeNodesByParentId?parentId=' + parentId);
+  getNodesByParentId(id) {
+    return this.http.get('/parentId/' + id);
   }
 
   getRootNode() {
-    return this.http.get('/getTreeNodeById?treeId=100000');
+    return this.http.get('/' + 100000);
   }
 
   getAllNodes() {
-    return this.http.get('/getAllTreeNodes');
+    return this.http.get('/all');
   }
 }
 
