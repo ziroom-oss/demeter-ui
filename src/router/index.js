@@ -18,33 +18,9 @@ export const routes = [
         name: 'EngineeringMetric',
         meta: {
           title: '工程指标',
-          hidden: false,
           icon: 'code',
         },
         component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/EngineerManagePanel/index.vue')
-      },
-      {
-        path: 'PortraitManagement',
-        name: 'PortraitManagement',
-        redirect: '/PortaraitManagement/EmployeePortrait',
-        meta: {
-          title: '画像管理',
-          sort: 1,
-          icon: 'smile',
-        },
-        component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/Portrait/index.vue'),
-        children: [
-          {
-            path: 'EmployeePortrait',
-            name: 'EmployeePortrait',
-            meta: {
-              title: '画像信息',
-              home: true,
-              hidden: false,
-            },
-            component: () => import(/* webpackChunkName: "EngineeringMetric" */'@/views/Portrait/EmployeePortrait/index.vue')
-          }
-        ]
       },
     ]
   },
@@ -61,7 +37,28 @@ export const routes = [
 
 // 这里配置需要准入权限的路由，结构和上述相同
 export const asyncRoutes = [
-];
+    {
+      path: 'System',
+      name: 'System',
+      meta: {
+        title: '系统管理',
+        icon: 'code',
+        roles: ['demeter-super-admin', 'demeter-dept-admin'],
+      },
+      component: () => import(/* webpackChunkName: "System" */'@/views/System/index.vue'),
+      children: [
+        {
+          path: 'SkillMap',
+          name: 'SkillMap',
+          meta: {
+            title: '技能图谱',
+            icon: 'code',
+          },
+          component: () => import(/* webpackChunkName: "SkillMap" */'@/views/System/SkillMap/index.vue'),
+        }
+      ]
+    },
+  ];
 
 Vue.use(VueRouter);
 const router = new VueRouter({

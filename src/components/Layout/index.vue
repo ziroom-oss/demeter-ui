@@ -30,6 +30,7 @@
           </a-menu-item>
           <SubMenu
             v-else
+            :dataPath="route.path"
             :key="route.path"
             :menu-info="route">
           </SubMenu>
@@ -94,10 +95,15 @@ const SubMenu = {
       type: Object,
       default: () => ({}),
     },
+    'dataPath': {
+      type: String,
+      default: '',
+    }
   },
   methods: {
     goTo(path) {
-      this.$router.push(path);
+      console.log(this.dataPath);
+      this.$router.push('/' + this.dataPath + '/' + path);
     }
   }
 };
@@ -106,10 +112,6 @@ export default {
   components: {
     SubMenu,
   },
-  mounted() {
-    // 任意用户可见
-    console.info(routes);
-  },
   watch: {
     '$route.path': {
       immediate: true,
@@ -117,23 +119,18 @@ export default {
         this.changeSelectedMenuItem(path);
       }
     },
-    'store.permission.state.routes': {
-      immediate: true,
-      deep: true,
-      handler: function(routes) {
-        this.routes = routes[0].children;
-      }
+  },
+  computed: {
+    routes() {
+      return this.$store.state.permission?.routes;
     }
   },
   data() {
     return {
       collapsed: false,
-      routes: [],
       userinfo: { username: '未登录用户', nickname: '???' },
       selectedKeys: [],
     };
-  },
-  created() {
   },
   methods: {
     goTo(path) {

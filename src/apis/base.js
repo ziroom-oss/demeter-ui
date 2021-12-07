@@ -1,23 +1,30 @@
 import HttpAxios from "@/common/utils/HttpAxios";
 // import { getOauthToken, doOauthLogout } from "@ziroom/zcloud-head";
 import { Message } from "element-ui";
+import store from '@/store';
 
 const requestDefaultInterceptor = function (config) {
     // 补充
     // config.headers['X-ZCLOUD-TOKEN'] = getOauthToken();
-    if (process.env.VUE_ENV_CONFIG === 'dev') {
+    if (process.env.VUE_APP_ENV_CONFIG === 'dev') {
         config.baseURL = '';
         config.url = '/dev' + config.url;
+    }
+
+    const token = store.state.permission.token;
+    if (token) {
+        config.headers.Authorization = token;
     }
     return config;
 }
 
 const responseDefaultInterceptor = function (response) {
     console.info(response);
-    if (!response.data.success) {
+    if (response.data.resultCode !== '00000') {
         Message.warning('系统开小差了，请联系管理员');
         return Promise.reject(new Error(response.data.resultMessage));
     }
+
     return response.data.result;
 }
 

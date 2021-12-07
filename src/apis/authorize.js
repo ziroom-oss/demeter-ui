@@ -1,10 +1,13 @@
+/**
+ * @File 废弃文件
+ */
 import Request from './Request';
 
 export const ACCESS_TOKEN = 'demeter-access-token';
 export const USER_INFO = 'demeter-userinfo';
 class Auth {
-  constructor() {
-    this.http = new Request({ prefixURL: '/api/common' });
+  constructor() {wwodehisjid
+    this.http = new Request({ prefixURL: '/api/' });
   }
 
   getAuthorize (params) {
@@ -12,7 +15,7 @@ class Auth {
   }
 
   doLogin({ username, password, }) {
-    return this.http.post('/auth/login', { username, password });
+    return this.http.post('/auth/', { username, password });
   }
 
   doLogout() {
