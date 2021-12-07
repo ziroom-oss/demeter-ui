@@ -76,7 +76,7 @@
               </div>
               <div style="text-align: center; margin-top: 16px">
                 <el-button type="primary" style="width: 120px" size="mini" @click="onSave">保 存</el-button>
-                <el-button type="primary" style="width: 120px" size="mini" @click="$router.push('/system/skillMap')">返 回</el-button>
+                <el-button type="primary" style="width: 120px" size="mini" @click="$router.push('/system/SkillMapManagement')">返 回</el-button>
               </div>
             </el-main>
           </el-container>
@@ -237,10 +237,10 @@ export default {
       })
       Promise.all(saveMapSkillQueue).then(res => {
         this.$message.success('保存成功');
-        this.$router.push('/system/skillMap');
+        this.$router.push('/system/SkillMapManagement');
       }).catch(error => {
         this.$message.error(error.message + '： 保存失败，请重新关联');
-        this.$router.push('/system/skillMap');
+        this.$router.push('/system/SkillMapManagement');
       })
     },
     addSkill(row) {
@@ -276,7 +276,7 @@ export default {
           this.$refs.mapSkillsTree.render({
             canRemove: true,
             mapName: this.skillMapCreateReq.name,
-            mapId: this.skillMapId,
+            mapId: this.skillMapId, 
             mapSkills: this.mapSkills,
             isFinished: false
           });

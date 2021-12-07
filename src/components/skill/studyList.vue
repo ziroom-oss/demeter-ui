@@ -40,12 +40,11 @@
 </template>
 
 <script>
-//import { RouteConfig, Component, Vue } from "@ziroom/cherry2-decorator";
 import taskServer from "@/apis/task.js";
 import ehrServer from "@/apis/ehr.js";
 import dayjs from "dayjs";
-//import { getUserinfo } from "@ziroom/zcloud-head";
-@Component({
+export default {
+
   data() {
     return {
       allstudyListStatus: [],
@@ -136,12 +135,10 @@ import dayjs from "dayjs";
         .catch(() => {});
     },
     getCurrentUid() {
-      const user = getUserinfo();
-      return user.userInfo.uid;
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid;
     },
-   
- 
-  },
-})
-export default class App extends Vue {}
+  }
+
+}
 </script>

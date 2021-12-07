@@ -63,16 +63,16 @@
             <el-table-column label="操作" prop="" align="center" width="">
               <template slot-scope="scope">
                 <span>
-                  <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/Task/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
+                  <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/TaskManagement/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
                 </span>
                 <span>
-                  <el-button v-if="scope.row.taskType === 2" type="text" size="small" @click="$router.push({ path: '/Task/AssignDetail', query: { id: scope.row.id }})">查看</el-button>
+                  <el-button v-if="scope.row.taskType === 2" type="text" size="small" @click="$router.push({ path: '/TaskManagement/AssignDetail', query: { id: scope.row.id }})">查看</el-button>
                 </span>
                 <span v-if="scope.row.publisher === getCurrentUid() && scope.row.taskReceiverName === '' && scope.row.taskType === 1 && scope.row.taskStatus === 2">
-                  <el-button type="text" size="small" @click="$router.push({ path: '/Task/Skill', query: { id: scope.row.id }})">编辑</el-button>
+                  <el-button type="text" size="small" @click="$router.push({ path: '/TaskManagement/Skill', query: { id: scope.row.id }})">编辑</el-button>
                 </span>
                 <span v-if="scope.row.publisher === getCurrentUid() && scope.row.taskReceiverName === '' && scope.row.taskType === 2 && scope.row.taskStatus === 1">
-                  <el-button type="text" size="small" @click="$router.push({ path: '/Task/Assign', query: { id: scope.row.id }})">编辑</el-button>
+                  <el-button type="text" size="small" @click="$router.push({ path: '/TaskManagement/NewTaskAssign', query: { id: scope.row.id }})">编辑</el-button>
                 </span>
                 <span v-if="scope.row.publisher === getCurrentUid() && scope.row.taskType === 1 && scope.row.taskStatus === 1">
                   <el-button type="text" size="small" @click="confirmChange(scope.row.id, scope.row.taskType, 2)">禁用</el-button>
@@ -167,10 +167,10 @@
             <el-table-column label="操作" prop="" align="center" width="">
               <template slot-scope="scope">
                 <span>
-                  <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/Task/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
+                  <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/TaskManagement/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
                 </span>
                 <span>
-                  <el-button v-if="scope.row.taskType === 2" type="text" size="small" @click="$router.push({ path: '/Task/AssignDetail', query: { id: scope.row.id }})">查看</el-button>
+                  <el-button v-if="scope.row.taskType === 2" type="text" size="small" @click="$router.push({ path: '/TaskManagement/AssignDetail', query: { id: scope.row.id }})">查看</el-button>
                 </span>
                 <span>
                   <el-button v-if="scope.row.receiver === getCurrentUid() && scope.row.taskType === 2 && scope.row.taskFlowStatus === 1" type="text" size="small" @click="acceptTask(scope.row.id, scope.row.taskType)">认领</el-button>
@@ -212,10 +212,9 @@ import taskServer from '@/apis/task.js';
 import authServer from '@/apis/authorize.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-//import { getUserinfo } from '@ziroom/zcloud-head';
-
 export default {
-  data: function() {
+
+  data() {
     return {
       roles: [],
       releaseTaskFilter: {
@@ -388,8 +387,8 @@ export default {
       }
     },
     getCurrentUid () {
-      const user = getUserinfo();
-      return user.userInfo.uid
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid
     },
     acceptTask (id, type) {
       this.$confirm('确认认领此任务？', '提示', {

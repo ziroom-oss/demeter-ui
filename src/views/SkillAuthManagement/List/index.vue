@@ -62,7 +62,7 @@
         <el-table-column label="操作" prop="" align="center" width="">
           <template slot-scope="scope">
             <span>
-              <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/Task/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
+              <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/TaskManagement/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
             </span>
             <span>
               <el-button v-if="checkSkillAuth(scope.row)" type="text" size="small" @click="submitCheckTask(scope.row.id, scope.row.taskType)">发起认证</el-button>
@@ -89,7 +89,6 @@
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 export default {
    data: function() {
     return {
@@ -202,8 +201,8 @@ export default {
       })
     },
     getCurrentUid () {
-      const user = getUserinfo();
-      return user.userInfo.uid
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid
     },
     acceptTask (id, type) {
       this.$confirm('确认认领此任务？', '提示', {

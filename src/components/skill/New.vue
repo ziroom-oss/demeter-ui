@@ -88,8 +88,6 @@
 <script>
 import taskServer from '@/apis/task.js';
 import skillPointServer from '@/apis/skill.js'
-import newTaskServer from '@/apis/newTask.js';
-import newSkillPointServer from '@/apis/newSkill.js';
 import RemoteTreeSelect from '@/components/RemoteTreeSelect';
 import { v1 as uuidv1 } from 'uuid';
 import roleServer from '@/apis/role.js'
@@ -106,6 +104,7 @@ const form = {
   taskAttachmentUrl: '',
   attachment: '',
   taskRemark: '',
+  // @daijr
   skillTreeId: '',
   checkRoles: []
 }
@@ -129,7 +128,7 @@ export default {
   },
   
   async created() {
-    await newTaskServer.getAllSkillLevel().then(data => {
+    await taskServer.getAllSkillLevel().then(data => {
       this.skillLevelList = data.map(level => {
         return {
           label: level.desc,
@@ -185,16 +184,16 @@ export default {
     }
   },
   methods: {
-
     beforeClose () {
       this.$emit('refresh')
       this.$emit('closepop')
-      this.edit = false
+      this.edit = false;
+      this.$router.push('/SkillAuthManagement/SkillAssignList');
     },
-
     queryRoleList (val) {
-      roleServer.queryRoleList().then(res => {
-        console.log(res);
+      roleServer.queryRoleList({
+        queryCondition: val
+      }).then(res => {
         this.roleList = res.map(i => {
           return {
             code: i.id,
@@ -203,7 +202,6 @@ export default {
         })
       })
     },
-
     onModify (formName) {
       const data = new FormData()
       data.append('id', this.skillTaskForm.id)
@@ -214,16 +212,18 @@ export default {
       }));
       data.append('skillLevel', this.skillTaskForm.skillLevel)
       data.append('skillReward', this.skillTaskForm.skillReward)
+      data.append('taskDescription', this.skillTaskForm.taskDescription)
       data.append('taskRemark', this.skillTaskForm.taskRemark)
       data.append('checkRoles', this.skillTaskForm.checkRoles)
-      data.append('modifyId', 'xuzeyu');
-      
+      data.append('modifyId', '60028724');
       const skillTreeIds = this.selectNodes.map(node => {
         return node.id;
       })
       data.append('skillTreeId', skillTreeIds);
-      console.log(data);
-      newSkillPointServer.updateSkillPoint(data).then(() => {
+      if (this.skillTaskForm.attachment !== undefined) {
+        data.append('attachment', this.skillTaskForm.attachment);
+      }
+      skillPointServer.updateSkillPoint(data).then(() => {
         this.$message({
           message: '技能点编辑成功！',
           type: "success"
@@ -233,7 +233,6 @@ export default {
       }).catch(err => {
       });
     },
-
     onSubmit(formName) {
       const data = new FormData();
       data.append('taskName', this.skillTaskForm.taskName);
@@ -244,23 +243,39 @@ export default {
       data.append('skillLevel', this.skillTaskForm.skillLevel);
       data.append('skillReward', this.skillTaskForm.skillReward);
       data.append('checkRoles', this.skillTaskForm.checkRoles)
+      data.append('taskDescription', this.skillTaskForm.taskDescription);
       data.append('taskRemark', this.skillTaskForm.taskRemark);
-      data.append('publisher', "xuzeyu");
+      data.append('publisher', '60028724');
       const skillTreeIds = this.selectNodes.map(node => {
         return node.id;
       })
       data.append('skillTreeId', skillTreeIds);
-      newSkillPointServer.saveSkillPoint(data).then(() => {
+      if (this.skillTaskForm.attachment !== '') {
+        data.append('attachment', this.skillTaskForm.attachment);
+      }
+      skillPointServer.saveSkillPoint(data).then(() => {
         this.$message({
           message: '新建技能点成功！',
           type: "success"
         });
         this.beforeClose()
         this.$emit('refresh')
-      }).catch(() => {
+        //this.$router.push('/SkillAuthManagement/SkillAssignList');
+      }).catch((error) => {
+        this.$message.error(error.message + '： 保存失败，请重新创建');
+        this.$router.push('/SkillAuthManagement/SkillAssignList');
       });
     },
-
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+    },
+    handelOnChange (file, fileList) {
+      this.fileList = [file];
+      this.skillTaskForm.attachment = file.raw;
+    },
+    handelRemove (response, file, fileList) {
+      this.skillTaskForm.attachment = null;
+    },
     removeDomain(item) {
       if (this.skillTaskForm.taskFinishCondition.length <= 1) {
         this.$message.warning('至少有一条验收标准');
@@ -271,7 +286,6 @@ export default {
         this.skillTaskForm.taskFinishCondition.splice(index, 1)
       }
     },
-
     addDomain() {
       if (this.skillTaskForm.taskFinishCondition.length >= 5) {
         this.$message.warning('技能点验收标准最多创建五条');
@@ -282,10 +296,9 @@ export default {
         key: new Date().getTime(),
       });
     },
-
     getTask (id) {
       this.edit = true;
-      newSkillPointServer.getSkillTask(id).then(data => {
+      skillPointServer.getSkillTask(id).then(data => {
         this.skillTaskForm = {
           id: data.id,
           taskName: data.taskName,
@@ -302,7 +315,18 @@ export default {
           skillTreeId: data.skillTreeId,
           checkRoles: data.checkRoles.split(',').map(Number)
         }
+        if (data && data.attachmentName && data.attachmentUrl) {
+          this.fileList = [{
+            name: data.attachmentName,
+            url: data.attachmentUrl
+          }]
+        }
       })
+    },
+
+    getCurrentUid () {
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid;
     },
   }
 

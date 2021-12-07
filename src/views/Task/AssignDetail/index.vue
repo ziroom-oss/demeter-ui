@@ -337,7 +337,6 @@
 <script>
 import taskServer from '@/apis/task.js';
 import dayjs from 'dayjs';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 import ehrServer from '@/apis/ehr.js';
 import SvgIcon from '@/components/svg-icon.vue';
 
@@ -509,8 +508,8 @@ export default {
     handelRemove (response, file, fileList) {
     },
     getCurrentUid () {
-      const user = getUserinfo();
-      return user.userInfo.uid
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid
     },
     // 检查是否可以认领
     checkAccept () {

@@ -30,6 +30,7 @@
           </a-menu-item>
           <SubMenu
             v-else
+            :dataPath="route.path"
             :key="route.path"
             :menu-info="route">
           </SubMenu>
@@ -39,16 +40,12 @@
       <!-- 副菜单区域 -->
       <a-menu mode="vertical" class="bottom-menu">
         <a-sub-menu key="userinfo">
-          <span slot="title"><a-icon type="smile" theme="twoTone"></a-icon><span>{{userinfo.nickName}}</span></span>
+          <span slot="title"><a-icon type="smile" theme="twoTone"></a-icon><span>{{userinfo.name}}</span></span>
           <a-menu-item>
             <a-icon type="logout" />
             <span @click="onLogout">登出</span>
           </a-menu-item>
         </a-sub-menu>
-        <!-- <a-menu-item key="theme" disabled>
-          <a-icon type="clock-circle" />
-          <span>切换主题</span>
-        </a-menu-item> -->
       </a-menu>
     </a-layout-sider>
 
@@ -67,13 +64,16 @@
 <script>
 import { Menu } from 'ant-design-vue';
 
+//import loginServer from '@/apis/login.js';
+import store from '@/store';
+
 const SubMenu = {
   template: `
       <a-sub-menu :key="menuInfo.path" v-bind="$props" v-on="$listeners" popupClassName="ant-menu-pop-custom">
         <span slot="title"><a-icon v-if="menuInfo.meta.icon" :type="menuInfo.meta.icon" /><span>{{ menuInfo.meta.title }}</span></span>
         <template v-for="item in menuInfo.children">
           <template v-if="!item.meta.hidden">
-            <a-menu-item v-if="!item.children" :key="item.path" @click="goTo(item.path)">
+            <a-menu-item v-if="!item.children" :key="item.path" @click="goTo(recurivePath(item.path))">
               <span><a-icon type="pie-chart" /><span>{{ item.meta.title }}</span></span>
             </a-menu-item>
             <sub-menu v-else :key="item.path" :menu-info="item" />
@@ -91,10 +91,17 @@ const SubMenu = {
       type: Object,
       default: () => ({}),
     },
+    'dataPath': {
+      type: String,
+      default: '',
+    }
   },
   methods: {
     goTo(path) {
       this.$router.push(path);
+    },
+    recurivePath(path) {
+      return '/' + this.dataPath + '/' + path;
     }
   }
 };
@@ -103,42 +110,44 @@ export default {
   components: {
     SubMenu,
   },
-  mounted() {
-    this.routes = getAsyncRoutes()[0].children;
-  },
   watch: {
     '$route.path': {
       immediate: true,
       handler: function(path) {
         this.changeSelectedMenuItem(path);
       }
+    },
+  },
+  computed: {
+    routes() {
+      return this.$store.state.permission?.routes;
     }
   },
   data() {
     return {
       collapsed: false,
-      routes: [],
       userinfo: this.$store.state.permission?.userinfo,
       selectedKeys: [],
     };
   },
-  created() {
-    this.userinfo = this.$store.state.permission?.userinfo || { username: '未知' };
+   created() {
+    this.userinfo = this.$store.state.permission?.userinfo || { username: '未知用户' };
   },
   methods: {
     goTo(path) {
-      this.$router.push(path);
+      this.$router.push('/' + path);
     },
     changeSelectedMenuItem(value) {
-      console.info(value);
       if (!value || typeof value !== 'string') return;
       this.selectedKeys = [value];
     },
     onLogout() {
       const result = window.confirm('请问是要登出吗？');
       if (result) {
-    //        doOauthLogout();
-    console.log(退出登录);
+        store.dispatch('doLogout').then(() => {
+      }).catch(error => {
+        alert('登出异常：' + error.message);
+      });
       }
     }
   }

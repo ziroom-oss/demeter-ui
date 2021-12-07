@@ -1,6 +1,7 @@
 
 import G6 from '@antv/g6';
 import mainVueTemplate from '../GraphTree/index.vue';
+import Vue from 'vue'
 import { cloneDeep } from 'lodash-es';
 
 /**

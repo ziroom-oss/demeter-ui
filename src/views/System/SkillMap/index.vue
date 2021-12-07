@@ -178,7 +178,7 @@ export default {
         })
       },
         onCreateMap(id) {
-          this.$router.push('/system/skillMapNew');
+          this.$router.push('/system/SkillMapNew');
         },
         onEnableGraph(row, status) {
           row.isEnable = status;

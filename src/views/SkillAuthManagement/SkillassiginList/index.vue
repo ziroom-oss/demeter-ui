@@ -162,15 +162,6 @@ export default {
         { label: '进行中', value: 2 },
         { label: '认证通过', value: 4 }
       ];
-      // @todo 添加清单菜单接口
-      // taskServer.getAllSkillFlowStatus().then((data) => {
-      //   this.allTaskFlowStatus = data.map((s) => {
-      //     return {
-      //       label: s.desc,
-      //       value: s.code,
-      //     };
-      //   });
-      // });
     },
     handleSizeChange(val) {
       this.receiveTaskFilter.pageSize = val;
@@ -242,8 +233,8 @@ export default {
         .catch(() => {});
     },
     getCurrentUid() {
-      const user = getUserinfo();
-      return user.userInfo.uid;
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid;
     },
     acceptTask(id, type) {
       this.$confirm("确认认领此任务？", "提示", {

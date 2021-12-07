@@ -117,7 +117,6 @@
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import { v1 as uuidv1 } from 'uuid';
-import { cloneDeep } from 'lodash-es';
 
 export default {
    mounted() {
@@ -213,7 +212,7 @@ export default {
           message: '新建指派任务成功！',
           type: "success"
         });
-        this.$router.push('/Task/List');
+        this.$router.push('/TaskManagement/TaskList');
       }).catch(() => {
       });
     },

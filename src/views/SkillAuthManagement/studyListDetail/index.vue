@@ -73,7 +73,6 @@
 <script>
 import taskServer from '@/apis/task.js';
 import dayjs from 'dayjs';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 import SvgIcon from '@/components/svg-icon.vue';
 import StudyListPreview from '@/components/RemoteMapSkillTree/studyListPreview.vue';
 export default {
@@ -195,8 +194,8 @@ export default {
     },
     
     getCurrentUid () {
-      const user = getUserinfo();
-      return user.userInfo.uid
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid
     },
    
     // 检查是否可以提交认证 当前登录人 && 任务状态为进行中 2 || 认证未通过 5

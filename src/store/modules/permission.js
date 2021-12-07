@@ -1,4 +1,5 @@
 import login from '@/apis/login';
+import auth from '@/apis/authorize';
 import { routes, asyncRoutes } from '@/router';
 import { intersection } from 'lodash-es';
 
@@ -37,33 +38,32 @@ export default {
     },
     SET_ROUTES(state, accessRoutes) {
       state.routes = routes[0].children.concat(accessRoutes[0].children);
-      //state.routes = accessRoutes[0].children;
     }
   },
   actions: {
     getAccessRoutes({ commit }) {
       return new Promise((resolve, reject) => {
         let accessRoutes = [];
-        accessRoutes = filterAsyncRoutes(asyncRoutes, ['demeter-dept-admin']);
-        console.info(accessRoutes);
-        if (accessRoutes.length > 0) {
-          commit('SET_ROUTES', accessRoutes);
-          return resolve(accessRoutes);
-        }
-        resolve([]);
-        // @Todo 接口调试
-        // login.getAuth().then(res => {
-        //   if (res.roles.length < 1) {
-        //     commit('SET_ROUTES', []);
-        //     resolve([]);
-        //   } else {
-        //     accessRoutes = filterAsyncRoutes(asyncRoutes, res.roles);
-        //     commit('SET_ROUTES', accessRoutes);
-        //     resolve(accessRoutes);
-        //   }
-        // }).catch(error => {
-        //   reject(error);
-        // })
+        // accessRoutes = filterAsyncRoutes(asyncRoutes, ['demeter-dept-admin']);
+        // console.info(accessRoutes);
+        // if (accessRoutes.length > 0) {
+        //   commit('SET_ROUTES', accessRoutes);
+        //   return resolve(accessRoutes);
+        // }
+        // resolve([]);
+        auth.getAuthorize().then(res => {
+          console.log(res);
+          if (res.roles.length < 1) {
+            commit('SET_ROUTES', []);
+            resolve([]);
+          } else {
+            accessRoutes = filterAsyncRoutes(asyncRoutes, res.roles);
+            commit('SET_ROUTES', accessRoutes);
+            resolve(accessRoutes);
+          }
+        }).catch(error => {
+          reject(error);
+        })
       })
     },
     doUserLogin({ commit }, { username, password }) {
@@ -78,7 +78,7 @@ export default {
       })
     },
     doLogout() {
-      authorize.doLogout().then(() => {
+      login.doLogout().then(() => {
         window.location.reload();
       })
     }

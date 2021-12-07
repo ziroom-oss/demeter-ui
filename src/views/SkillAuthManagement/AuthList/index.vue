@@ -2,19 +2,6 @@
   <div>
     <div>
       <div style="display: flex; flex-flow: row nowrap;">
-<!--        <div>-->
-<!--          <el-select-->
-<!--            v-model="receiveTaskFilter.skillPointLevel"-->
-<!--            placeholder="选择技能点等级"-->
-<!--            size="small">-->
-<!--            <el-option-->
-<!--              v-for="item in pointLevelList"-->
-<!--              :key="item.value"-->
-<!--              :label="item.label"-->
-<!--              :value="item.value">-->
-<!--            </el-option>-->
-<!--          </el-select>-->
-<!--        </div>-->
         <div style="margin-left: 16px;">
           <el-select
             v-model="receiveTaskFilter.taskStatus"
@@ -51,7 +38,6 @@
             </el-tooltip>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="类型" prop="taskTypeName" align="center" width=""></el-table-column> -->
         <el-table-column label="执行状态" prop="taskFlowStatusName" align="center" width=""></el-table-column>
         <el-table-column label="提交认证时间" prop="taskCreateTime" align="center" width="150">
         </el-table-column>
@@ -61,7 +47,7 @@
         <el-table-column label="操作" prop="" align="center" width="">
           <template slot-scope="scope">
             <span>
-              <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/Task/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
+              <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/TaskManagement/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
             </span>
             <span>
               <el-button v-if="scope.row.taskType === 1 && scope.row.taskFlowStatus === 3" type="text" size="small" @click="quickCheck(scope.row.id, scope.row.taskUserId, scope.row.receiver, scope.row.id)">快速认证</el-button>
@@ -85,11 +71,9 @@
 </template>
 
 <script>
-//import { RouteConfig, Component, Vue } from '@ziroom/cherry2-decorator';
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 import skillPointServer from '@/apis/skill.js'
 export default {
 
@@ -186,16 +170,6 @@ export default {
     },
     searchReceiveList () {
       const params = this.receiveTaskFilter;
-      // params.systemCode = this.getCurrentUid();
-      // taskServer.receiveList(params).then(data => {
-      //   this.total = data.total;
-      //   this.receiveTaskList = data.data.map(task => {
-      //     return {
-      //       ...task,
-      //       taskCreateTime: dayjs(task.createTime).format('YYYY-MM-DD HH:mm:ss')
-      //     }
-      //   })
-      // })
       skillPointServer.getSkillPointsCheckList(params).then(data => {
         this.total = data.total;
         this.receiveTaskList = data.data.map(task => {
@@ -230,8 +204,8 @@ export default {
       })
     },
     getCurrentUid () {
-      const user = getUserinfo();
-      return user.userInfo.uid
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid;
     },
     acceptTask (id, type) {
       this.$confirm('确认认领此任务？', '提示', {

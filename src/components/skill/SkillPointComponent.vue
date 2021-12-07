@@ -33,8 +33,6 @@
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-//import { getUserinfo } from '@ziroom/zcloud-head';
-import { pick } from 'lodash-es';
 import RemoteTreeSelect from '@/components/RemoteTreeSelect';
 import map from '@/apis/map.js';
 import skillPointServer from '@/apis/skill.js';
@@ -140,19 +138,6 @@ export default {
 
   methods: {
     addSkill(row) {  
-      // const row = {
-      //   id: parseInt(skill.id),
-      //   jobLevel: skill.jobLevel,
-      //   publisher:skill.publisher,
-      //   skillLevel:skill.skillLevel,
-      //   skillMapId:skill.skillMapId,
-      //   skillName:skill.skillName,
-      //   skillReward:skill.skillReward,
-      //   skillTaskId: parseInt(skill.skillTaskId),
-      //   skillTreeId:skill.skillTreeId,
-      //   taskStatus:1,
-      //   checkRole:"4"
-      // }
       this.$emit('getSkillPoints', row);
       },
  
@@ -199,8 +184,8 @@ export default {
       })
     },
     getCurrentUid () {
-      const user = getUserinfo();
-      return user.userInfo.uid
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid;
     },
     searchSkill () {
       //const params = this.searchSkillFilter;

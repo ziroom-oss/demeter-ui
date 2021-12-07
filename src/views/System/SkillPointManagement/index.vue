@@ -87,7 +87,7 @@
             <el-table-column label="操作" prop="" align="center" width="">
               <template slot-scope="scope">
                 <span>
-                  <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/Task/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
+                  <el-button v-if="scope.row.taskType === 1" type="text" size="small" @click="$router.push({ path: '/TaskManagement/SkillDetail', query: { id: scope.row.id }})">查看</el-button>
                 </span>
                 <span v-if="scope.row.publisher === getCurrentUid() && scope.row.taskReceiverName === '' && scope.row.taskType === 1 && scope.row.taskStatus === 2">
                   <el-button type="text" size="small" @click="openEditSkill(scope.row.id)">编辑</el-button>
@@ -122,7 +122,6 @@
 import taskServer from '@/apis/task.js';
 import ehrServer from '@/apis/ehr.js';
 import dayjs from 'dayjs';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 import RemoteTreeSelect from '@/components/RemoteTreeSelect';
 import SkillDialog from '@/components/skill/New.vue'
 export default {
@@ -296,9 +295,8 @@ export default {
       })
     },
     getCurrentUid () {
-      // const user = getUserinfo();
-      // return user.userInfo.uid
-      return '60028724';
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid;
     },
   }
 }

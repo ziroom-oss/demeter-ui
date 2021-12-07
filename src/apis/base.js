@@ -1,7 +1,6 @@
 import HttpAxios from "@/common/utils/HttpAxios";
 import { Message } from "element-ui";
 import store from '@/store';
-import { getToken } from '@/common/login.js';
 
 const requestDefaultInterceptor = function (config) {
     // 补充
@@ -11,10 +10,10 @@ const requestDefaultInterceptor = function (config) {
         config.url = '/dev' + config.url;
     }
 
-    // const token = getToken
-    // if (token) {
-    //     config.headers.Authorization = token;
-    // }
+    const token = store.state.permission.token;
+    if (token) {
+        config.headers.Authorization = token;
+    }
     return config;
 }
 

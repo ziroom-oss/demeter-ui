@@ -362,7 +362,6 @@ import map from '@/apis/map.js';
 import jobs from '@/apis/jobs.js';
 import tree from '@/apis/tree.js';
 import dayjs from 'dayjs';
-//import { getUserinfo } from '@ziroom/zcloud-head';
 import SvgIcon from '@/components/svg-icon.vue';
 export default {
     components: {
@@ -572,8 +571,8 @@ export default {
       // this.assignTaskForm.attachment = null;
     },
     getCurrentUid () {
-      const user = getUserinfo();
-      return user.userInfo.uid
+      const user = this.$store.state.permission?.userinfo;
+      return user.uid
     },
 
     // 检查是否可以认领，若接收者中已有当前登录人，则不可认领

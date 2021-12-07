@@ -1,5 +1,5 @@
 import Request from './base';
-class Auth {
+class Login {
   constructor() {
     this.http = new Request({ prefixURL: '/open/api' });
   }
@@ -17,4 +17,4 @@ class Auth {
   }
 }
 
-export default new Auth();
+export default new Login();
