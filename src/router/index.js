@@ -37,28 +37,34 @@ export const routes = [
 
 // 这里配置需要准入权限的路由，结构和上述相同
 export const asyncRoutes = [
-    {
-      path: 'System',
-      name: 'System',
-      meta: {
-        title: '系统管理',
-        icon: 'code',
-        roles: ['demeter-super-admin', 'demeter-dept-admin'],
+  {
+    path: '/',
+    component: Layout,
+    children: [
+      {
+        path: 'System',
+        name: 'System',
+        meta: {
+          title: '系统管理',
+          icon: 'code',
+          roles: ['demeter-super-admin'],
+        },
+        component: () => import(/* webpackChunkName: "System" */'@/views/System/index.vue'),
+        children: [
+          {
+            path: 'SkillMap',
+            name: 'SkillMap',
+            meta: {
+              title: '技能图谱',
+              icon: 'code',
+            },
+            component: () => import(/* webpackChunkName: "SkillMap" */'@/views/System/SkillMap/index.vue'),
+          }
+        ]
       },
-      component: () => import(/* webpackChunkName: "System" */'@/views/System/index.vue'),
-      children: [
-        {
-          path: 'SkillMap',
-          name: 'SkillMap',
-          meta: {
-            title: '技能图谱',
-            icon: 'code',
-          },
-          component: () => import(/* webpackChunkName: "SkillMap" */'@/views/System/SkillMap/index.vue'),
-        }
-      ]
-    },
-  ];
+    ]
+  }
+];
 
 Vue.use(VueRouter);
 const router = new VueRouter({

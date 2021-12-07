@@ -36,14 +36,14 @@ export default {
       state.token = accessToken;
     },
     SET_ROUTES(state, accessRoutes) {
-      state.routes = routes[0].children.concat(accessRoutes);
+      state.routes = routes[0].children.concat(accessRoutes[0].children);
     }
   },
   actions: {
     getAccessRoutes({ commit }) {
       return new Promise((resolve, reject) => {
         let accessRoutes = [];
-        accessRoutes = filterAsyncRoutes(asyncRoutes, ['demeter-super-admin']);
+        accessRoutes = filterAsyncRoutes(asyncRoutes, ['demeter-dept-admin']);
         console.info(accessRoutes);
         if (accessRoutes.length > 0) {
           commit('SET_ROUTES', accessRoutes);

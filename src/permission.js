@@ -11,9 +11,11 @@ router.beforeEach(async (to, from, next) => {
   if (userinfo) {
     if (routes.length < 1) {
       const accessRoutes = await store.dispatch('getAccessRoutes');
-      accessRoutes.forEach(route => {
-        router.addRoute(route);
-      })
+      if (accessRoutes.length > 0) {
+        accessRoutes.forEach(route => {
+          router.addRoute(route);
+        });
+      }
       next({ ...to, replace: true });
     } else {
       next();

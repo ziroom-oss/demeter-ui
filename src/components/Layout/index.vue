@@ -77,7 +77,7 @@ const SubMenu = {
         <span slot="title"><a-icon v-if="menuInfo.meta.icon" :type="menuInfo.meta.icon" /><span>{{ menuInfo.meta.title }}</span></span>
         <template v-for="item in menuInfo.children">
           <template v-if="!item.meta.hidden">
-            <a-menu-item v-if="!item.children" :key="item.path" @click="goTo(item.path)">
+            <a-menu-item v-if="!item.children" :key="item.path" @click="goTo(recurivePath(item.path))">
               <span><a-icon type="pie-chart" /><span>{{ item.meta.title }}</span></span>
             </a-menu-item>
             <sub-menu v-else :key="item.path" :menu-info="item" />
@@ -102,8 +102,10 @@ const SubMenu = {
   },
   methods: {
     goTo(path) {
-      console.log(this.dataPath);
-      this.$router.push('/' + this.dataPath + '/' + path);
+      this.$router.push(path);
+    },
+    recurivePath(path) {
+      return '/' + this.dataPath + '/' + path;
     }
   }
 };
@@ -134,7 +136,7 @@ export default {
   },
   methods: {
     goTo(path) {
-      this.$router.push(path);
+      this.$router.push('/' + path);
     },
     changeSelectedMenuItem(value) {
       if (!value || typeof value !== 'string') return;
