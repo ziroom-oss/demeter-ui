@@ -112,6 +112,7 @@ export default {
     },
     add(skillPointModel) {
       this.$emit('addSkill', cloneDeep(skillPointModel));
+      this.skillPopup.display = 'none'
     }
   }
 }
