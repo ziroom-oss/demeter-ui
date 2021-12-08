@@ -17,7 +17,8 @@
           <p class="skill-text">技能奖励：{{ skillPopup.model.skillReward }}</p>
         </div>
         <div>
-          <el-button size="mini" type="text" @click="open('/#/Task/SkillDetail?id=' + skillPopup.model.skillTaskId)">详情</el-button>
+          <el-button size="mini" type="text" @click="$router.push({ path: '/TaskManagement/SkillDetail', query: { id: skillPopup.model.skillTaskId }})">详情</el-button>
+          <!-- <el-button size="mini" type="text" @click="open('/#/TaskManagement/SkillDetail?id=' + skillPopup.model.skillTaskId)">详情</el-button> -->
           <el-button size="mini" type="text" @click="add(skillPopup.model)">添加学习路径</el-button>
           <el-button size="mini" type="text" @click="remove(skillPopup.model)">移除本节点</el-button>
           <el-button size="mini" type="text" @click="skillPopup.display = 'none'">关闭</el-button>

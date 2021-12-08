@@ -20,7 +20,8 @@
         </div>
         <div>
           <el-button size="mini" type="text" @click="remove(skillPopup.model)" v-if="canRemove">移除</el-button>
-          <el-button size="mini" type="text" @click="detail('/#/Task/SkillDetail?id=' + skillPopup.model.skillTaskId)">查看详情</el-button>
+          <el-button size="mini" type="text" @click="$router.push({ path: '/TaskManagement/SkillDetail', query: { id: skillPopup.model.skillTaskId }})">查看详情</el-button>
+          <!-- <el-button size="mini" type="text" @click="detail('/#/TaskManagement/SkillDetail?id=' + skillPopup.model.skillTaskId)">查看详情</el-button> -->
           <el-button size="mini" type="text" @click="skillPopup.display = 'none'">关闭</el-button>
           <el-button size="mini" type="text" @click="addToStudyList(skillPopup.model)" v-if="canAddStudy">添加到学习清单</el-button>
           <el-button size="mini" type="text" @click="addToStudyPath(skillPopup.model)" v-if="canAddStudy">添加学习路径</el-button>

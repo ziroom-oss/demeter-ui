@@ -11,7 +11,7 @@
       collapsible
     >
       <div class="site-title">
-        <h1><img class="site-logo" src="/public/img/brand_logo@2x.png" alt=""><span>员工发展平台</span></h1>
+        <h1><img class="site-logo" src="/img/brand_logo@2x.png" alt=""><span>员工发展平台</span></h1>
       </div>
 
       <!-- 主菜单区域 -->

@@ -82,7 +82,8 @@ export default {
       this.graphTree.setState({ name, nodes: this.treeNodes, source });
       this.graphTree.onEvent('nodeClick:query', (evt) => {
         const model = evt.item.get('model');
-        this.open('/#/Task/SkillDetail?id=' + model.skillTaskId);
+        this.open('/#/TaskManagement/SkillDetail?id=' + model.skillTaskId);
+        //this.$router.push({ path: '/TaskManagement/SkillDetail', query: { id: model.skillTaskId }});
       });
     },
     open(url) {
