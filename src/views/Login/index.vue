@@ -1,9 +1,10 @@
 <template>
-  <div>
-    登录页面
-    <el-card>
+  <div class="loginStyle">
+    <div style="width:350px; height:550px;text-align:center" >
+    <h2>登录页面</h2>
+    <el-card class="loginStyle1">
       <el-form>
-        <el-form-item label="用户名">
+        <el-form-item  label="用户名">
           <el-input v-model="username" auto-complete="true"></el-input>
         </el-form-item>
         <el-form-item label="密码">
@@ -15,6 +16,9 @@
       </el-form>
     </el-card>
   </div>
+
+  </div>
+  
 </template>
 
 <script>
@@ -23,8 +27,8 @@ import store from '@/store';
 export default {
   data() {
     return {
-      username: '',
-      password: '',
+      username: 'daijk',
+      password: '1',
     }
   },
   methods: {
@@ -43,3 +47,22 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.loginStyle1 {
+   width:350px;height:350px;  /*设置div的大小*/
+   border:1px solid green;    /*边框*/
+   text-align: center;        /*文字水平居中对齐*/
+   line-height: 200px;        /*设置文字行距等于div的高度*/
+   overflow:hidden;
+}
+.loginStyle{
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  width:200px;
+  height:100px;
+  margin-left:-100px;
+  margin-top:-50px;
+}
+</style>

@@ -19,7 +19,7 @@ const requestDefaultInterceptor = function (config) {
 
 const responseDefaultInterceptor = function (response) {
     console.info(response);
-    if (response.data.resultCode !== '00000') {
+    if (!response.data.success) {
         Message.warning('系统开小差了，请联系管理员');
         return Promise.reject(new Error(response.data.resultMessage));
     }
