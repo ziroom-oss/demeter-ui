@@ -18,6 +18,10 @@ const requestDefaultInterceptor = function (config) {
 }
 
 const responseDefaultInterceptor = function (response) {
+    if (!response.data.success && response.data.resultCode === '20701'){
+        return Promise.reject(new Error(response.data.resultMessage));
+    }
+
     if (response.data.code === 'NO_LOGIN' || response.data.code === '50003' || response.data.code === '20703'
         || response.data.code === '20704' || response.data.code === '20704'){
         window.sessionStorage.removeItem('demeter-ui-permission');
