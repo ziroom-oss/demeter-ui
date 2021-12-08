@@ -38,7 +38,7 @@ export default {
         return alert('请填写必要的登陆信息');
       }
       store.dispatch('doUserLogin', { username, password }).then(() => {
-        this.$router.push('/');
+        this.$router.push('/').catch(err => {});
       }).catch(error => {
         alert('登陆错误：' + error.message);
       });
