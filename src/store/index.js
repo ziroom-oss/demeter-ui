@@ -19,9 +19,7 @@ export default new Vuex.Store({
 		createPersistedState({
 			storage: window.sessionStorage,
 			key: "demeter-ui-permission",
-			render(state) {
-				return { ...state };
-			}
+			paths: ['permission.userinfo', 'permission.token']
 		})
 	],
 });
