@@ -41,7 +41,7 @@
             </el-col>
             <el-col :span="6" style="margin-left: 10px">
               <el-button type="primary" size="small" @click="searchReleaseList">搜索</el-button>
-              <el-button size="small" @click="$router.push('/Task/Assign')">新建任务</el-button>
+              <el-button size="small" @click="$router.push('/TaskManagement/NewTaskAssign')">新建任务</el-button>
             </el-col>
           </el-row>
         </div>
