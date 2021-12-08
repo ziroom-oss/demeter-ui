@@ -836,12 +836,15 @@ export default {
     },
 
     getCurrentUid () {
-      NewEhrServer.getUserInfo().then(data => {
-        const user =  data;
-        this.selectUserCode = user.userCode;
-        console.log(this.selectUserCode);
-        return user.userCode;
-      })
+      // NewEhrServer.getUserInfo().then(data => {
+      //   const user =  data;
+      //   this.selectUserCode = user.userCode;
+      //   console.log(this.selectUserCode);
+      //   return user.userCode;
+      // })
+      let user = this.$store.state.permission?.userinfo;
+      let uid = user.uid;
+      return uid;
     },
 
     handleClick (tab, event) {

@@ -228,7 +228,7 @@ export default {
       const submit = this.createStudyList();
       taskServer.createManifest(submit).then(res => {
         this.$message.success('创建成功');
-        this.$router.push({ name: 'SkillAuthManagement_SkillAssignList' });
+        this.$router.push('SkillAssignList');
       }).catch(error => {
         this.$message.error(error.message + '： 创建失败，请重新关联');
       })
@@ -257,7 +257,7 @@ export default {
       };
       taskServer.modifyManifest(submit).then(() => {
         this.$message.success('修改成功');
-        this.$router.push({ name: 'SkillAuthManagement_SkillAssignList' });
+        this.$router.push('SkillAssignList');
       }).catch(err => {
         this.$message.error(err.message);
       })

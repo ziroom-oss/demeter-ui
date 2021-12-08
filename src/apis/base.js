@@ -18,7 +18,12 @@ const requestDefaultInterceptor = function (config) {
 }
 
 const responseDefaultInterceptor = function (response) {
-    console.info(response);
+    if (response.data.code === 'NO_LOGIN' || response.data.code === '50003' || response.data.code === '20703'
+        || response.data.code === '20704' || response.data.code === '20704'){
+        window.sessionStorage.removeItem('demeter-ui-permission');
+        window.location.reload();
+        return Promise.reject(new Error(response.data.resultMessage));
+    }
     if (!response.data.success) {
         Message.warning('系统开小差了，请联系管理员');
         return Promise.reject(new Error(response.data.resultMessage));
