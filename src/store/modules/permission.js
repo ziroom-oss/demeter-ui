@@ -79,6 +79,7 @@ export default {
     },
     doLogout() {
       login.doLogout().then(() => {
+        window.sessionStorage.removeItem('demeter-ui-permission');
         window.location.reload();
       })
     }

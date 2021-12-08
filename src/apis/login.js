@@ -9,7 +9,7 @@ class Login {
   }
 
   doLogout() {
-    return this.http.post('/logout');
+    return this.http.post('/logout', {});
   }
 
   getAuth() {
