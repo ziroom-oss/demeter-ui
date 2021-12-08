@@ -164,11 +164,9 @@ export default {
       ];
     },
     handleSizeChange(val) {
-      this.receiveTaskFilter.pageSize = val;
       this.refreshstudyList();
     },
     handleCurrentChange(val) {
-      this.studylistFilter.pageNumber = val;
       this.refreshstudyList();
     },
     refreshstudyList() {
