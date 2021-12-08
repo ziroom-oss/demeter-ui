@@ -86,7 +86,7 @@
           <div style="margin-top: 16px">
             <el-button type="primary" size="small" @click="addStudyList" v-if="!$route.query.id">创建</el-button>
             <el-button type="primary" size="small" @click="modifyStudyList" v-if="$route.query.id">修改</el-button>
-            <el-button type="primary" size="small" @click="$router.push({name: 'SkillAuthManagement_SkillAssignList'})" >取消</el-button>
+            <el-button type="primary" size="small" @click="$router.push('SkillAssignList')" >取消</el-button>
           </div>
         </el-main>
       </el-container>
@@ -165,6 +165,7 @@ export default {
     if (studyListId) {
       taskServer.getStudyListDetail(studyListId).then(res => {
         const { name, learnPeriodStart, learnPeriodEnd, learnerUid, demeterSkillTasks, demeterSkillLearnPaths  } = res;
+        console.log(res);
         Object.assign(this.editBasicInfo, { name, learnerUid, learnPeriodStart, learnPeriodEnd });
         this.learnPeriod = [learnPeriodStart, learnPeriodEnd];
         // // 对学习路径和技能任务作已保存 isSaved 的标记，避免再次添加
@@ -249,12 +250,41 @@ export default {
       });
     },
     modifyStudyList() {
-      const id = this.$route.query.id;
-      if (!id) return this.$message.error('未知学习清单（没有清单 id 或者清单不存在）')
+      const studyListid = this.$route.query.id;
+      if (!studyListid) return this.$message.error('未知学习清单（没有清单 id 或者清单不存在）')
+      // const submit = {
+      //   id,
+      //   ...omit(this.createStudyList(), ['skillPaths']),
+      // };
+
+      const refStudyListTree = this.$refs.mapSkillStudyListTree;
+      const skillPoints = refStudyListTree.getSkillPoints();
+      // @todo studyPaths 对应服务的 skillPaths 参数
+      const studyPaths = refStudyListTree.getStudyPaths();
+      // 先从所有 skillPoints 整理出 Record<skillTaskId, string[]> 的结构
+      const skillPaths = skillPoints
+          .map(sp => sp.skillTaskId)
+          .reduce((acc, curr) => {
+            acc[curr] = [];
+            return acc;
+          }, {});
+      // 遍历所有学习路径，如果该路径的父级是 skillPoints 其中一个则推入它的值数组
+      studyPaths.forEach(sp => {
+        // sp 的 parentId 即 skillPoint 的 skillTaskId
+        if (skillPaths[sp.parentId]) {
+          skillPaths[sp.parentId].push(sp.name);
+        }
+      });
+
       const submit = {
-        id,
-        ...omit(this.createStudyList(), ['skillPaths']),
+        id : studyListid,
+        name: this.editBasicInfo.name,
+        learnPeriodStart: this.learnPeriod[0],
+        learnPeriodEnd: this.learnPeriod[1],
+        learnerUid: this.editBasicInfo.learnerUid,
+        skillPaths,
       };
+
       taskServer.modifyManifest(submit).then(() => {
         this.$message.success('修改成功');
         this.$router.push('SkillAssignList');

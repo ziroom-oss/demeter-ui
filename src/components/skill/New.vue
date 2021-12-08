@@ -188,7 +188,7 @@ export default {
       this.$emit('refresh')
       this.$emit('closepop')
       this.edit = false;
-      this.$router.push('/SkillAuthManagement/SkillAssignList');
+      this.$router.push('/System/SkillPointList');
     },
     queryRoleList (val) {
       roleServer.queryRoleList({
