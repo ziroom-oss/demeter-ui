@@ -27,7 +27,7 @@ import store from '@/store';
 export default {
   data() {
     return {
-      username: 'daijk',
+      username: 'gongsl1',
       password: '1',
     }
   },
@@ -58,7 +58,7 @@ export default {
 }
 .loginStyle{
   position: absolute;
-  left: 50%;
+  left: 48%;
   top: 30%;
   width:200px;
   height:100px;
