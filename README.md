@@ -46,4 +46,4 @@ vue-element-admin | 项目脚手架参考 | [https://github.com/PanJiaChen/vue-e
 
 ## 许可证
 
-[Apache License 2.0](https://github.com/ziroom/demeter-ui/LICENSE)
+[Apache License 2.0](LICENSE)
