@@ -3,7 +3,7 @@
 ## 友情提示 
 >1.  **快速体验项目**：暂未提供，运行项目请参照下文 [搭建步骤] 模块
 >2.  **演示版本账号**：管理员账号: gongsl1 密码: 1  普通成员账号: wangzj1 密码: 1。
->3.  **后端项目地址**：[demeter-api](https://github.com/ziroom/demeter-api)
+>3.  **后端项目地址**：[demeter-api](https://github.com/ziroom-oss/demeter-api)
 
 ## 前言
 `demeter`项目致力于为员工提供全方位的自我成长平台，为研发赋能，采用现阶段流行技术实现。
@@ -16,7 +16,7 @@
 
 ### 项目演示
 
-项目演示示例：[传送门](https://github.com/ziroom/demeter-api)  
+项目演示示例：[传送门](https://github.com/ziroom-oss/demeter-api)  
 
 
 ### 技术选型
