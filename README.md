@@ -36,11 +36,11 @@ vue-element-admin | 项目脚手架参考 | [https://github.com/PanJiaChen/vue-e
 
 ## 搭建步骤
 - 下载node并安装：[https://nodejs.org/dist/v12.14.0/node-v12.14.0-x64.msi](https://nodejs.org/dist/v12.14.0/node-v12.14.0-x64.msi);
-- 该项目为前后端分离项目，访问本地接口需搭建后台环境，搭建请参考后端项目[传送门](https://github.com/ziroom/demeter-api/README.md);
 - 克隆源代码到本地，使用Visual Studio Code打开;
 - 在Visual Studio Code命令行中运行命令：npm install,下载相关依赖;
 - 在Visual Studio Code命令行中运行命令：npm start,运行项目;
-- 启动后端项目；
+- 该项目为前后端分离项目，访问本地接口需搭建后台环境，搭建请参考后端项目[传送门](https://github.com/ziroom-oss/demeter-api/README.md);
+- 启动后端项目;
 - 访问地址：[http://localhost:8080](http://localhost:8080) 即可打开;
 
 
